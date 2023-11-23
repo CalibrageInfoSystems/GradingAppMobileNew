@@ -20,6 +20,7 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView;
 public class QRScanActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler{
 
     ZXingScannerView scannerView;
+    String Activityfrom;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +29,17 @@ public class QRScanActivity extends AppCompatActivity implements ZXingScannerVie
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("QR Scan");
         setSupportActionBar(toolbar);
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            try {
+                Activityfrom = extras.getString("ActivityName");
+
+
+                Log.e("=========>SCREEN_FROM", Activityfrom + "");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         ViewGroup contentFrame = (ViewGroup) findViewById(R.id.content_frame);
         scannerView = new ZXingScannerView(this);
@@ -38,14 +50,34 @@ public class QRScanActivity extends AppCompatActivity implements ZXingScannerVie
     public void handleResult(Result result) {
 
         Log.e("result.getText()",result.getText()+"");
-
-        if (!TextUtils.isEmpty(result.getText())){
-            Intent gradingintent = new Intent(QRScanActivity.this, GradingActivity.class);
-            gradingintent.putExtra("qrvalue", result.getText() + "");
-            startActivity(gradingintent);
-        }else{
-            Log.d("QRCode Scan", "Failed");
+        if(Activityfrom.equalsIgnoreCase("GatepassinActivity")){
+            if (!TextUtils.isEmpty(result.getText())){
+                Intent gradingintent = new Intent(QRScanActivity.this, GatepassinActivity.class);
+                gradingintent.putExtra("qrvalue", result.getText() + "");
+                startActivity(gradingintent);
+            }else{
+                Log.d("QRCode Scan", "Failed");
+            }
+        }else  if(Activityfrom.equalsIgnoreCase("GatepassoutActivity")){
+            if (!TextUtils.isEmpty(result.getText())){
+                Intent gradingintent = new Intent(QRScanActivity.this, GatepassoutActivity.class);
+                gradingintent.putExtra("qrvalue", result.getText() + "");
+                startActivity(gradingintent);
+            }else{
+                Log.d("QRCode Scan", "Failed");
+            }
         }
+        else{
+            if (!TextUtils.isEmpty(result.getText())){
+                Intent gradingintent = new Intent(QRScanActivity.this, GradingActivity.class);
+                gradingintent.putExtra("qrvalue", result.getText() + "");
+                startActivity(gradingintent);
+            }else{
+                Log.d("QRCode Scan", "Failed");
+            }
+        }
+
+
 
     }
 

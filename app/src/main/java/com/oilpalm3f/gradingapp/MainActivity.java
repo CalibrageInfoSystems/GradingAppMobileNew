@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.oilpalm3f.gradingapp.cloudhelper.Log;
+import com.oilpalm3f.gradingapp.ui.GatepassinActivity;
+import com.oilpalm3f.gradingapp.ui.GatepasstokenActivity;
 import com.oilpalm3f.gradingapp.ui.GradingActivity;
 import com.oilpalm3f.gradingapp.ui.GradingReportActivity;
 import com.oilpalm3f.gradingapp.ui.QRScanActivity;
@@ -19,7 +21,7 @@ import com.oilpalm3f.gradingapp.ui.RefreshSyncActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    ImageView scanImg, reportsImg, sync_logo;
+    ImageView scanImg, reportsImg, sync_logo,gatepassinimg,gatepasstokenimg,gatepassoutimg;
     LinearLayout synclyt;
 
 
@@ -36,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
         scanImg = findViewById(R.id.scanImg);
         reportsImg = findViewById(R.id.reportsImg);
         sync_logo = findViewById(R.id.refresh_logo1);
+        gatepassinimg = findViewById(R.id.gatepassinimg);
+        gatepasstokenimg =findViewById(R.id.gatepasstokenimg);
+        gatepassoutimg =findViewById(R.id.gatepassoutimg);
 
         sync_logo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,7 +65,32 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 Intent scanintent = new Intent(MainActivity.this, QRScanActivity.class);
+                scanintent.putExtra("ActivityName", "GradingActivity");
                 startActivity(scanintent);
+            }
+        });
+        gatepasstokenimg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent gatepassintent = new Intent(MainActivity.this, GatepasstokenActivity.class);
+                startActivity(gatepassintent);
+            }
+        });
+        gatepassinimg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent gatepassintent = new Intent(MainActivity.this, QRScanActivity.class);
+                gatepassintent.putExtra("ActivityName", "GatepassinActivity");
+                startActivity(gatepassintent);
+            }
+        });
+
+        gatepassoutimg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent gatepassintent = new Intent(MainActivity.this, QRScanActivity.class);
+                gatepassintent.putExtra("ActivityName", "GatepassoutActivity");
+                startActivity(gatepassintent);
             }
         });
     }

@@ -18,6 +18,8 @@ import com.oilpalm3f.gradingapp.common.CommonUtils;
 import com.oilpalm3f.gradingapp.database.DataAccessHandler;
 import com.oilpalm3f.gradingapp.database.DatabaseKeys;
 import com.oilpalm3f.gradingapp.database.Queries;
+import com.oilpalm3f.gradingapp.dbmodels.GatePass;
+import com.oilpalm3f.gradingapp.dbmodels.GatePassToken;
 import com.oilpalm3f.gradingapp.dbmodels.GradingFileRepository;
 import com.oilpalm3f.gradingapp.ui.MainLoginScreen;
 import com.oilpalm3f.gradingapp.uihelper.ProgressBar;
@@ -156,6 +158,7 @@ public class DataSyncHelper {
                 getRefreshSyncTransDataMap(context, new ApplicationThread.OnComplete<LinkedHashMap<String, List>>() {
                     @Override
                     public void execute(boolean success, final LinkedHashMap<String, List> transDataMap, String msg) {
+
                         if (success) {
                             if (transDataMap != null && transDataMap.size() > 0) {
                                 Log.v(LOG_TAG, "transactions data size " + transDataMap.size());
@@ -182,23 +185,42 @@ public class DataSyncHelper {
 
         List cctransDataList = refreshtransactionsDataMap.get(tableName);
 
+     //   List cctransDataList = refreshtransactionsDataMap.get(tableName);
+
         if (null != cctransDataList && cctransDataList.size() > 0) {
             Type listType = new TypeToken<List>() {
             }.getType();
             Gson gson = new GsonBuilder().serializeNulls().create();
 
             String dat = gson.toJson(cctransDataList, listType);
-            JSONArray transObj = new JSONArray();
+            JSONObject transObj = new JSONObject();
             try {
-                //transObj.put(tableName, new JSONArray(dat));
-                transObj = new JSONArray(dat);
+                transObj.put(tableName, new JSONArray(dat));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             Log.v(LOG_TAG, "@@@@ check.." + transObj.toString());
-            Log.v(LOG_TAG, "@@@@ checkkkkk.." + transObj.length());
             CommonConstants.SyncTableName = tableName;
-            CloudDataHandler.placeDataInCloudd(context, transObj, Config.live_url + Config.transactionSyncURL, new ApplicationThread.OnComplete<String>() {
+
+
+//
+//        if (null != cctransDataList && cctransDataList.size() > 0) {
+//            Type listType = new TypeToken<List>() {
+//            }.getType();
+//            Gson gson = new GsonBuilder().serializeNulls().create();
+//
+//            String dat = gson.toJson(cctransDataList, listType);
+//            JSONArray transObj = new JSONArray();
+//            try {
+//                //transObj.put(tableName, new JSONArray(dat));
+//                transObj = new JSONArray(dat);
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//            Log.v(LOG_TAG, "@@@@ check.." + transObj.toString());
+//            Log.v(LOG_TAG, "@@@@ checkkkkk.." + transObj.length());
+//            CommonConstants.SyncTableName = tableName;
+            CloudDataHandler.placeDataInCloud(context, transObj, Config.live_url + Config.transactionSyncURL, new ApplicationThread.OnComplete<String>() {
                 @Override
                 public void execute(boolean success, String result, String msg) {
 
@@ -216,7 +238,8 @@ public class DataSyncHelper {
                         } else {
                             postTransactionsDataToCloud(context, refreshtableNamesList.get(transactionsCheck), dataAccessHandler, onComplete);
                         }
-                    } else {
+                    }
+                    else {
                         ApplicationThread.uiPost(LOG_TAG, "Sync is failed", new Runnable() {
                             @Override
                             public void run() {
@@ -267,11 +290,14 @@ public class DataSyncHelper {
         final DataAccessHandler dataAccessHandler = new DataAccessHandler(context);
 
         List<GradingFileRepository> gradingrepoList = (List<GradingFileRepository>) dataAccessHandler.getGradingRepoDetails(Queries.getInstance().getGradingRepoRefresh(), 1);
+        List<GatePassToken>gatepasstokenlist = (List<GatePassToken>) dataAccessHandler.getGatepasstokendetails(Queries.getInstance().getGatepasstokenRefresh(), 1);
+        List<GatePass>gatepasslist = (List<GatePass>) dataAccessHandler.getGatepassdetails(Queries.getInstance().getGatepassRefresh(), 1);
 
 
         LinkedHashMap<String, List> allRefreshDataMap = new LinkedHashMap<>();
         allRefreshDataMap.put(DatabaseKeys.TABLE_Grading_Repository, gradingrepoList);
-
+        allRefreshDataMap.put(DatabaseKeys.TABLE_Gatepasstoken, gatepasstokenlist);
+        allRefreshDataMap.put(DatabaseKeys.TABLE_GatepassIN, gatepasslist);
 
         onComplete.execute(true, allRefreshDataMap, "here is collection of table transactions data");
 

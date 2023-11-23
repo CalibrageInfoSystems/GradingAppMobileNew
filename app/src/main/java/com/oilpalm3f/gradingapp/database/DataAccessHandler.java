@@ -6,14 +6,19 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.oilpalm3f.gradingapp.cloudhelper.ApplicationThread;
 import com.oilpalm3f.gradingapp.common.CommonUtils;
+import com.oilpalm3f.gradingapp.dbmodels.GatePass;
+import com.oilpalm3f.gradingapp.dbmodels.GatePassToken;
 import com.oilpalm3f.gradingapp.dbmodels.GradingFileRepository;
 import com.oilpalm3f.gradingapp.dbmodels.GradingReportModel;
 import com.oilpalm3f.gradingapp.dbmodels.UserDetails;
 import com.oilpalm3f.gradingapp.utils.ImageUtility;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -450,6 +455,113 @@ public class DataAccessHandler <T> {
         return (T) ((type == 0) ? mgradingrepository : gradingrepolist);
     }
 
+    public T getGatepasstokendetails(final String query, final int type) {
+        List<GatePassToken> gatepasslist = new ArrayList<>();
+        GatePassToken  gatePassTokendata= null;
+        Cursor cursor = null;
+        Log.v(LOG_TAG, "@@@ GatePassToken details query " + query);
+        try {
+            cursor = mDatabase.rawQuery(query, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
 
+
+                    gatePassTokendata = new GatePassToken();
+
+
+
+                    gatePassTokendata.setGatePassTokenCode(cursor.getString(cursor.getColumnIndex("GatePassTokenCode")));
+                    gatePassTokendata.setVehicleNumber(cursor.getString(cursor.getColumnIndex("VehicleNumber")));
+                    gatePassTokendata.setGatePassSerialNumber(cursor.getInt(cursor.getColumnIndex("GatePassSerialNumber")));
+                    gatePassTokendata.setIsCollection(cursor.getInt(cursor.getColumnIndex("IsCollection")));
+//                    gatePassTokendata.setGrossWeight(cursor.getDouble(cursor.getColumnIndex("GrossWeight")));
+                    gatePassTokendata.setCreatedByUserId(cursor.getInt(cursor.getColumnIndex("CreatedByUserId")));
+                    gatePassTokendata.setCreatedDate(cursor.getString(cursor.getColumnIndex("CreatedDate")));
+                    gatePassTokendata.setServerUpdatedStatus(0);
+                    if (type == 1) {
+                        gatepasslist.add(gatePassTokendata);
+                        gatePassTokendata = null;
+                    }
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "@@@ getting GradingRepo details " + e.getMessage());
+        }
+        return (T) ((type == 0) ? gatePassTokendata : gatepasslist);
+    }
+
+    public String getserialnumber(final String maxNum) {
+        // String maxNum = getOnlyOneValueFromDb(query);
+        String convertedNum = "";
+        if (!TextUtils.isEmpty(maxNum)) {
+            convertedNum = CommonUtils.serialNumber(Integer.parseInt(maxNum) , 3);
+        } else {
+            convertedNum = CommonUtils.serialNumber(1, 3);
+        }
+        //   StringBuilder farmerCoder = new StringBuilder();
+        String finalNumber = StringUtils.leftPad(convertedNum,3,"0");
+
+        Log.v(LOG_TAG, "@@@ finalNumber code " + finalNumber);
+        return finalNumber;
+    }
+
+
+    public LinkedHashMap<String, String> getvechileData(final String query) {
+        Log.v(LOG_TAG, "@@@ Generic Query " + query);
+        LinkedHashMap<String, String> mGenericData = new LinkedHashMap<>();
+        Cursor genericDataQuery = null;
+        try {
+            genericDataQuery = mDatabase.rawQuery(query, null);
+            if (genericDataQuery.moveToFirst()) {
+                do {
+                    mGenericData.put(genericDataQuery.getString(0), genericDataQuery.getString(2));
+                } while (genericDataQuery.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.e(LOG_TAG, e.getMessage());
+        } finally {
+//            palm3FoilDatabase.closeDataBase();
+            if (null != genericDataQuery)
+                genericDataQuery.close();
+
+            closeDataBase();
+        }
+        return mGenericData;
+    }
+
+
+    public T getGatepassdetails(final String query, final int type) {
+        List<GatePass> gatepasslist = new ArrayList<>();
+        GatePass  gatePassdata= null;
+        Cursor cursor = null;
+        Log.v(LOG_TAG, "@@@ GatePass details query " + query);
+        try {
+            cursor = mDatabase.rawQuery(query, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+
+
+                    gatePassdata = new GatePass();
+                    gatePassdata.setGatePassCode(cursor.getString(cursor.getColumnIndex("GatePassTokenCode")));
+                    gatePassdata.setGatePassTokenCode(cursor.getString(cursor.getColumnIndex("GatePassTokenCode")));
+                    gatePassdata.setWeighbridgeId(cursor.getInt(cursor.getColumnIndex("WeighbridgeId")));
+                    gatePassdata.setVehicleTypeId(cursor.getInt(cursor.getColumnIndex("VehicleTypeId")));
+                    gatePassdata.setCreatedByUserId(cursor.getInt(cursor.getColumnIndex("CreatedByUserId")));
+                    gatePassdata.setCreatedDate(cursor.getString(cursor.getColumnIndex("CreatedDate")));
+                    gatePassdata.setIsVehicleOut(cursor.getInt(cursor.getColumnIndex("VehicleTypeId")));
+                    gatePassdata.setUpdatedByUserId(cursor.getInt(cursor.getColumnIndex("UpdatedByUserId")));
+                    gatePassdata.setUpdatedDate(cursor.getString(cursor.getColumnIndex("UpdatedDate")));
+                    gatePassdata.setServerUpdatedStatus(0);
+                    if (type == 1) {
+                        gatepasslist.add(gatePassdata);
+                        gatePassdata = null;
+                    }
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "@@@ getting GatePass details " + e.getMessage());
+        }
+        return (T) ((type == 0) ? gatePassdata : gatepasslist);
+    }
 
 }

@@ -4,6 +4,7 @@
     package="com.oilpalm3f.gradingapp">
 
     <uses-sdk tools:overrideLibrary="com.google.zxing.client.android" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -31,20 +32,29 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
-        android:requestLegacyExternalStorage="true"
         android:name=".Oil3FPalmMainApplication"
         android:allowBackup="true"
         android:appComponentFactory="android.support.v4.app.CoreComponentFactory"
         android:hardwareAccelerated="false"
-        android:largeHeap="true"
         android:icon="@drawable/ic_appcon"
         android:label="@string/app_name"
+        android:largeHeap="true"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@drawable/ic_appcon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:replace="android:appComponentFactory">
-        <activity android:name=".ui.GradingReportActivity"></activity>
+        <activity
+            android:name=".ui.GatepassoutActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.GatepasstokenActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.GatepassinActivity"
+            android:exported="false" />
+        <activity android:name=".ui.GradingReportActivity" />
         <activity android:name=".ui.RefreshSyncActivity" />
         <activity android:name=".ui.GradingActivity" />
         <activity android:name=".ui.QRScanActivity" />
@@ -71,7 +81,10 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
-        <uses-library android:name="org.apache.http.legacy" android:required="false"/>
+
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
     </application>
 
 </manifest>

@@ -7,5 +7,6 @@ import java.util.List;
 public class DatabaseKeys {
 
     public static String TABLE_Grading_Repository = "FFBGradingRepository";
-
+    public static String TABLE_Gatepasstoken = "GatePassToken";
+    public static String TABLE_GatepassIN = "GatePass";
 }

@@ -39,6 +39,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -352,6 +353,52 @@ public class CommonUtils {
             ex.printStackTrace();
             onComplete.execute(false, "failed", "failed");
         }
+    }
+
+    public static String serialNumber(int number, int stringLength) {
+        int numberOfDigits = String.valueOf(number).length();
+        int numberOfLeadingZeroes = stringLength - numberOfDigits;
+        StringBuilder sb = new StringBuilder();
+        if (numberOfLeadingZeroes > 0) {
+            for (int i = 0; i < numberOfLeadingZeroes; i++) {
+                sb.append("0");
+            }
+        }
+        sb.append(number);
+        return sb.toString();
+    }
+
+    //Maps Data
+    public static String[] fromMap(LinkedHashMap<String, String> inputMap, String type) {
+        Collection c = inputMap.values();
+        Iterator itr = c.iterator();
+        int size = inputMap.size() + 1;
+        String[] toMap = new String[size];
+       toMap[0] = "-- Select " + type + " --";
+        int iCount = 1;
+        while (iCount < size && itr.hasNext()) {
+            toMap[iCount] = itr.next().toString();
+            iCount++;
+        }
+        while (iCount < size && itr.hasNext()) {
+            toMap[iCount] = itr.next().toString();
+            iCount++;
+        }
+        return toMap;
+    }
+    public static String[] fromMap1(LinkedHashMap<String, String> inputMap) {
+        Collection<String> values = inputMap.values();
+        Iterator<String> itr = values.iterator();
+        int size = inputMap.size();
+        String[] toMap = new String[size];
+
+        int iCount = 0;
+        while (iCount < size && itr.hasNext()) {
+            toMap[iCount] = itr.next().toString();
+            iCount++;
+        }
+
+        return toMap;
     }
 
 

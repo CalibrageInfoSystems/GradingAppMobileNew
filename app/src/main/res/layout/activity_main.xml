@@ -10,8 +10,8 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:ignore="MissingConstraints"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:theme="@style/AppTheme.AppBarOverlay"
+        tools:ignore="MissingConstraints">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -37,85 +37,215 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
+        android:elevation="10dp"
+        android:orientation="horizontal"
         android:paddingTop="10dp"
         android:paddingRight="10dp"
-        android:elevation="10dp"
-        android:visibility="gone"
-        android:orientation="horizontal">
+        android:visibility="gone">
 
         <ImageView
 
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
             android:src="@drawable/sync_homelogo_nerw"
             android:visibility="visible" />
 
     </LinearLayout>
 
     <View
-        android:visibility="gone"
         android:layout_width="match_parent"
-        android:layout_marginTop="5dp"
-        android:paddingTop="10dp"
         android:layout_height="2dp"
+        android:layout_below="@+id/notficationRel"
+        android:layout_marginTop="5dp"
         android:background="@color/gray"
-        android:layout_below="@+id/notficationRel">
-    </View>
-
+        android:paddingTop="10dp"
+        android:visibility="gone"></View>
 
     <LinearLayout
-       android:layout_width="match_parent"
-       android:layout_height="wrap_content"
-       android:orientation="horizontal">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
 
-       <RelativeLayout
-           android:id="@+id/reportsRel"
-           android:layout_width="0dp"
-           android:layout_height="wrap_content"
-           android:layout_weight="1"
-           android:visibility="visible">
+        android:weightSum="3">
 
 
-           <ImageView
-               android:id="@+id/scanImg"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:layout_centerInParent="true"
-               android:layout_marginTop="16dp"
-               android:src="@mipmap/consignment_icon" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:weightSum="2">
 
-           <TextView
-               style="@style/moduleHomeBtnStyle"
-               android:layout_below="@+id/scanImg"
-               android:text="Scan QR" />
+            <LinearLayout
+                android:id="@+id/reportsRel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:orientation="vertical"
 
-       </RelativeLayout>
-
-       <RelativeLayout
-           android:id="@+id/syncRel"
-           android:layout_width="0dp"
-           android:layout_height="wrap_content"
-           android:layout_weight="1">
+                android:visibility="visible"
+                android:weightSum="1">
 
 
-           <ImageView
-               android:id="@+id/reportsImg"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:layout_centerInParent="true"
-               android:layout_marginTop="16dp"
-               android:src="@mipmap/reports_icon" />
+                <ImageView
+                    android:id="@+id/scanImg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_gravity="center"
 
-           <TextView
-               android:id="@+id/receiveConsignment_txt"
-               style="@style/moduleHomeBtnStyle"
-               android:layout_below="@+id/reportsImg"
-               android:text="Reports" />
+                    android:layout_weight="1"
+                    android:src="@mipmap/consignment_icon" />
 
-       </RelativeLayout>
+                <TextView
+                    style="@style/moduleHomeBtnStyle"
+                    android:layout_below="@+id/scanImg"
+                    android:layout_gravity="center"
+                    android:text="Scan QR"
+                    android:textColor="@color/black" />
 
-   </LinearLayout>
+            </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/reportsRel_1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:visibility="visible"
+                android:weightSum="1">
+
+
+                <ImageView
+                    android:id="@+id/reportsImg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:padding="5dp"
+                    android:src="@mipmap/reports_icon" />
+
+                <TextView
+                    style="@style/moduleHomeBtnStyle"
+                    android:layout_below="@+id/scanImg"
+                    android:layout_gravity="center"
+                    android:text="Reports"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <LinearLayout
+                android:id="@+id/reportsRel_2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:orientation="vertical"
+
+                android:visibility="visible"
+                android:weightSum="1">
+
+
+                <ImageView
+                    android:id="@+id/gatepasstokenimg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_gravity="center"
+
+                    android:layout_weight="1"
+                    android:src="@drawable/gatepasstoken"/>
+
+                <TextView
+                    style="@style/moduleHomeBtnStyle"
+                    android:layout_below="@+id/scanImg"
+                    android:layout_gravity="center"
+                    android:text="Gate Pass Token"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/reportsRel_5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:visibility="visible"
+                android:weightSum="1">
+
+
+                <ImageView
+                    android:id="@+id/gatepassinimg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:padding="5dp"
+                    android:src="@drawable/gatepassin"/>
+
+                <TextView
+                    style="@style/moduleHomeBtnStyle"
+                    android:layout_below="@+id/scanImg"
+                    android:layout_gravity="center"
+                    android:text="Gate Pass In"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+
+            <LinearLayout
+                android:id="@+id/reportsRel_4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:visibility="visible"
+                android:weightSum="1">
+
+
+                <ImageView
+                    android:id="@+id/gatepassoutimg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:padding="5dp"
+                    android:src="@drawable/gatepassout"/>
+
+                <TextView
+                    style="@style/moduleHomeBtnStyle"
+                    android:layout_below="@+id/scanImg"
+                    android:layout_gravity="center"
+                    android:text="Gate Pass Out"
+                    android:textColor="@color/black" />
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

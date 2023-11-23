@@ -420,4 +420,10 @@
         <item>Yes</item>
         <item>No</item>
     </string-array>
+
+    <string-array name="fruittype">
+        <item>---Select Fruit type---</item>
+        <item>Collection</item>
+        <item>Consignment </item>
+    </string-array>
 </resources>

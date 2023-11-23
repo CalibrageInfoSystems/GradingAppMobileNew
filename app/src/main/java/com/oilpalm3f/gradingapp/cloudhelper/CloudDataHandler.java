@@ -24,6 +24,31 @@ import java.util.List;
 public class CloudDataHandler {
 
     private static final String LOG_TAG = CloudDataHandler.class.getName();
+    public static synchronized void placeDataInCloud(final Context context,final JSONObject values, final String url, final ApplicationThread.OnComplete<String> onComplete) {
+        ApplicationThread.bgndPost(CloudDataHandler.class.getName(), "placeDataInCloud..", () -> {
+            try {
+                HttpClient.postDataToServerjson(context,url, values, new ApplicationThread.OnComplete<String>() {
+                    @Override
+                    public void execute(boolean success, String result, String msg) {
+                        if (success) {
+                            try {
+                                onComplete.execute(true, result, msg);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                onComplete.execute(true, result, msg);
+                            }
+                        } else{
+                            onComplete.execute(false, result, msg);
+                        }
+
+                    }
+                });
+            } catch (Exception e) {
+                Log.v(LOG_TAG, "@Error while getting " + e.getMessage());
+            }
+        });
+
+    }
 
     //To Place Data In Cloud
     public static synchronized void placeDataInCloudd(final Context context, final JSONArray values, final String url, final ApplicationThread.OnComplete<String> onComplete) {

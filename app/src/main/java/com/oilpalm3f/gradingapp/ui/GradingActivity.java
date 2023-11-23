@@ -352,7 +352,7 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
                     PrinterChooserFragment printerChooserFragment = new PrinterChooserFragment();
                     printerChooserFragment.setPrinterType(GradingActivity.this);
                     printerChooserFragment.show(fm, "bluetooth fragment");
-                    //saveGradingData();
+                  //  saveGradingData();
                 }
             }
         });
@@ -666,96 +666,6 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
         sb.append(" Gross Weight(Kgs) : ").append(splitString[3] + "").append("\n");
         sb.append(" ");
         sb.append(" Grading Date : ").append(CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_4) + "").append("\n");
-
-//        sb.append(" ");
-//        sb.append("-----------------------------------------------\n");
-//        sb.append("  FFB Quality Details" + "\n");
-//        sb.append("-----------------------------------------------\n");
-//
-//        if (!unripen.getText().toString().equalsIgnoreCase("0")) {
-//            sb.append(" ");
-//            sb.append(" Unripen : ").append(unripen.getText().toString() + "%").append("\n");
-//        }
-//        if (!underripe.getText().toString().equalsIgnoreCase("0")) {
-//            sb.append(" ");
-//            sb.append(" Under Ripe : ").append(underripe.getText().toString() + "%").append("\n");
-//        }
-//        if (!ripen.getText().toString().equalsIgnoreCase("0")) {
-//            sb.append(" ");
-//            sb.append(" Ripen : ").append(ripen.getText().toString() + "%").append("\n");
-//        }
-//        if (!overripe.getText().toString().equalsIgnoreCase("0")) {
-//            sb.append(" ");
-//            sb.append(" Over Ripe : ").append(overripe.getText().toString() + "%").append("\n");
-//        }
-//        if (!diseased.getText().toString().equalsIgnoreCase("0")) {
-//            sb.append(" ");
-//            sb.append(" Diseased : ").append(diseased.getText().toString() + "%").append("\n");
-//        }
-//        if (!emptybunches.getText().toString().equalsIgnoreCase("0")) {
-//            sb.append(" ");
-//            sb.append(" Empty Bunch's : ").append(emptybunches.getText().toString() + "%").append("\n");
-//        }
-//
-//        sb.append(" ");
-//        sb.append("-----------------------------------------------\n");
-//        sb.append("  Stalk Quality Details" + "\n");
-//        sb.append("-----------------------------------------------\n");
-//
-//        if (!longstalk.getText().toString().equalsIgnoreCase("0")) {
-//            sb.append(" ");
-//            sb.append(" Long : ").append(longstalk.getText().toString() + "%").append("\n");
-//        }
-//        if (!mediumstalk.getText().toString().equalsIgnoreCase("0")) {
-//            sb.append(" ");
-//            sb.append(" Medium : ").append(mediumstalk.getText().toString() + "%").append("\n");
-//        }
-//        if (!shortstalk.getText().toString().equalsIgnoreCase("0")) {
-//            sb.append(" ");
-//            sb.append(" Short : ").append(shortstalk.getText().toString() + "%").append("\n");
-//        }
-//        if (!optimum.getText().toString().equalsIgnoreCase("0")) {
-//            sb.append(" ");
-//            sb.append(" Optimum : ").append(optimum.getText().toString() + "%").append("\n");
-//        }
-//
-//        sb.append(" ");
-//        sb.append("-----------------------------------------------\n");
-//
-//        if (!TextUtils.isEmpty(loosefruitweight.getText().toString())){
-//            sb.append(" ");
-//            sb.append(" Loose Fruit Approx.Quantity : ").append(loosefruitweight.getText().toString() + "(Kgs)").append("\n");
-//        }
-//
-//        if (!TextUtils.isEmpty(rejectedBunches.getText().toString())) {
-//            sb.append(" ");
-//            sb.append(" Rejected Bunches : ").append(rejectedBunches.getText().toString() + "").append("\n");
-//        }
-//            sb.append(" ");
-//            sb.append(" Grader Name : ").append(gradingdoneby.getText().toString()).append("\n");
-//
-//
-//        sb.append(" ");
-//        sb.append("\n");
-//        sb.append(" ");
-//        sb.append("\n");
-//        sb.append(" ");
-//        sb.append("\n");
-//        sb.append(" ");
-//        sb.append("\n");
-//        sb.append(" Ramp Incharge/Grader signature");
-//        sb.append(" ");
-//        sb.append("\n");
-//        sb.append(" ");
-//        sb.append("\n");
-//        sb.append(" ");
-//        sb.append("\n");
-//        sb.append(" ");
-//        sb.append("\n");
-//        sb.append(" Farmer signature");
-//        sb.append(" ");
-//        sb.append("\n");
-//        sb.append(" ");
 
         mPrinter.printText(sb.toString());
 

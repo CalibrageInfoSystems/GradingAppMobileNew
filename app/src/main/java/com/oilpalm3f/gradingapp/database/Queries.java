@@ -612,7 +612,13 @@ public class Queries {
     public String getGradingRepoRefresh() {
         return "select * from FFBGradingRepository where ServerUpdatedStatus = 0";
     }
+    public String getGatepasstokenRefresh() {
+        return "select * from GatePassToken where ServerUpdatedStatus = 0";
+    }
 
+    public String getGatepassRefresh() {
+        return "select * from GatePasswhere ServerUpdatedStatus = 0";
+    }
     public String getFileRepositoryRefresh() {
         return "select * from FileRepository where ServerUpdatedStatus = 0";
     }
@@ -961,7 +967,9 @@ public class Queries {
         return "SELECT MAX(cast(substr(Code, INSTR(Code,'-') + 1, length(Code)) as INTEGER)) as maxNumber , Code" +
                 " FROM Pest where Code like '%" + plotCode + "%' ORDER BY ID DESC LIMIT 1";
     }
-
+    public String getGatePassSerialNumber(final String date) {
+        return " select GatePassSerialNumber  as Maxnumber FROM  GatePassToken Where CreatedDate like '" + date + "' ORDER BY ID DESC LIMIT 1";
+    }
     public String getMaxCropMaintenanceHistoryCode(final String plotCode, final String userId) {
         return "SELECT MAX(cast(substr(replace(code,PlotCOde,''), INSTR(replace(code,PlotCOde,''),'-') + 1, length(replace(code,PlotCOde,''))) as INTEGER)) as maxNumber , Code " +
                 "FROM CropMaintenanceHistory where Code like '%" + plotCode + "%' and " +
@@ -1284,5 +1292,13 @@ public class Queries {
 
     public String getImageQuery(String tokenNumber) {
         return "select FileLocation from FFBGradingRepository where TokenNumber = '" + tokenNumber + "'";
+    }
+
+    public String getVehicleCategoryType() {
+        return "SELECT * from TypeCddmt Where Classtypeid = 68";
+    }
+
+    public String getVehicleTypeonCategory(String TypeCdId) {
+        return "SELECT * from LookUp Where LookUpTypeId = '"+TypeCdId+"'";
     }
 }
