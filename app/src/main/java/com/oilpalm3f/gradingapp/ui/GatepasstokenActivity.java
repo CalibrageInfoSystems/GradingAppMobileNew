@@ -36,6 +36,7 @@ import com.oilpalm3f.gradingapp.utils.UiUtils;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -109,18 +110,42 @@ import java.util.List;
 //                    enablePrintBtn(false);
 //                    submit.setAlpha(0.5f);
 
+//                     Calendar calendar = Calendar.getInstance();
+//                     Date currentDate = calendar.getTime();
+//
+//                     calendar.set(Calendar.HOUR_OF_DAY, 6);
+//                     calendar.set(Calendar.MINUTE, 0);
+//                     calendar.set(Calendar.SECOND, 0);
+//                     calendar.set(Calendar.MILLISECOND, 0);
+//
+//
+//                     // Get today's date at 6:00:00
+//                     Date todayAt6AM = calendar.getTime();
+//
+//                     // Move back one day
+//                     calendar.add(Calendar.DAY_OF_MONTH, +1);
+//
+//                     // Get yesterday's date at 6:00:00
+//                     Date tommorowAt6AM = calendar.getTime();
+//
+//                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+
+
                      String currentDate = CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY);
-                     Log.d("currentDate", currentDate + "");
+//                     Log.d("currentDate", currentDate + "");
+//                     Log.d("todayAt6AM", dateFormat.format(todayAt6AM));
 
                      String maxnumber = dataAccessHandler.getOnlyOneValueFromDb(Queries.getInstance().getGatePassSerialNumber(currentDate));
                      Log.d("maxnumber", maxnumber + "");
+                     String incrementedMaxNumber = "";
                      if(maxnumber!=null) {
                          try {
                              // Convert maxnumber to integer and increment by 1
                              int incrementedNumber = Integer.parseInt(maxnumber) + 1;
 
                              // Convert back to string
-                             String incrementedMaxNumber = String.valueOf(incrementedNumber);
+                              incrementedMaxNumber = String.valueOf(incrementedNumber);
                              GatePassSerialNumber = dataAccessHandler.getserialnumber(incrementedMaxNumber);
                              Log.d("maxnumber", incrementedMaxNumber);
                              Log.d("GatePassSerialNumber", GatePassSerialNumber + "");
@@ -130,7 +155,7 @@ import java.util.List;
                          }
                      }
                      else{
-                         GatePassSerialNumber = dataAccessHandler.getserialnumber(maxnumber);
+                         GatePassSerialNumber = dataAccessHandler.getserialnumber(incrementedMaxNumber);
                          Log.d("GatePassSerialNumber134", GatePassSerialNumber + "");
 
                      }
@@ -160,7 +185,7 @@ import java.util.List;
          List<LinkedHashMap> details = new ArrayList<>();
          LinkedHashMap map = new LinkedHashMap();
 
-         map.put("GatePassTokenCode", currentDateTime +"/"+ GatePassSerialNumber +"/" + vehiclenumber.getText().toString());
+         map.put("GatePassTokenCode", currentDateTime + GatePassSerialNumber );
          map.put("VehicleNumber", vehiclenumber.getText().toString());
          map.put("GatePassSerialNumber", GatePassSerialNumber);
 
@@ -264,6 +289,13 @@ import java.util.List;
 
      public void printGAtepasstoken(PrinterInstance mPrinter, boolean isReprint, int printCount) {
 
+         int token = Integer.parseInt(GatePassSerialNumber);
+         Log.d("token", token + "");
+         String formattedToken = String.valueOf(token);
+         String tokenCount = "";
+         tokenCount = formattedToken;
+         Log.d("tokenCount", tokenCount + "");
+
          mPrinter.init();
          StringBuilder sb = new StringBuilder();
          mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_CENTER);
@@ -271,7 +303,7 @@ import java.util.List;
          mPrinter.printText(" 3F OILPALM PVT LTD " + "\n");
          mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_CENTER);
          mPrinter.setCharacterMultiple(0, 1);
-         mPrinter.printText(" Gate Pass Token Receipt " + "\n");
+         mPrinter.printText(" Gate Serial Number " + "\n");
          mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_LEFT);
          mPrinter.setCharacterMultiple(0, 0);
          mPrinter.setLeftMargin(15, 15);
@@ -304,15 +336,15 @@ import java.util.List;
          mPrinter.setCharacterMultiple(0, 1);
 
          String space = "-----------------------------------------------";
-//         String tokenNumber  =  "Token Number";
+         String tokenNumber  =  "Token Number";
        String spaceBuilderr = "\n";
-//
-//         mPrinter.printText(space);
-//         mPrinter.printText(spaceBuilderr);
-//         mPrinter.printText(tokenNumber);
-//         mPrinter.printText(spaceBuilderr);
-//         mPrinter.printText(GatePassSerialNumber);
-//         mPrinter.printText(spaceBuilderr);
+
+         mPrinter.printText(space);
+         mPrinter.printText(spaceBuilderr);
+         mPrinter.printText(tokenNumber);
+         mPrinter.printText(spaceBuilderr);
+         mPrinter.printText(tokenCount);
+         mPrinter.printText(spaceBuilderr);
          mPrinter.printText(space);
          mPrinter.printText(spaceBuilderr);
 

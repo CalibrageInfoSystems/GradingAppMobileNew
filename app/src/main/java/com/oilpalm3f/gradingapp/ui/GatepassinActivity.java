@@ -57,8 +57,8 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
     String currentDateTime;
     private LinkedHashMap<String, String> VehicleTypeMap, VehicleCategoryTypeMap,WeighbridgeIMap;
     private String vehicleCategoryCode, vehicleCategoryType;
-    private String vehicleTypeCode, vehicleTypeName;
-   private String WeighbridgeCode, WeighbridgeName;
+    private String vehicleTypeCode, vehicleTypeName, WeighbridgeId, WeighbridgeCode, WeighbridgeName;
+   //private String WeighbridgeCode, WeighbridgeName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,24 +159,29 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
         });
 
 
-        WeighbridgeIMap =dataAccessHandler.getvechileData(Queries.getInstance().getVehicleCategoryType());
+        WeighbridgeIMap =dataAccessHandler.getvechileData(Queries.getInstance().getWeighbridgeDetails());
         ArrayAdapter spinnerArrayAdapter= new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
                 CommonUtils.fromMap1(WeighbridgeIMap));
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Weighbridge_spinner.setEnabled(false);
+        Weighbridge_spinner.setClickable(false);
         Weighbridge_spinner.setAdapter(spinnerArrayAdapter);
 
         int randomIndex = new Random().nextInt(WeighbridgeIMap.size());
-
         Weighbridge_spinner.setSelection(randomIndex);
 
         Weighbridge_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
+                WeighbridgeId = WeighbridgeIMap.keySet().toArray(new String[WeighbridgeIMap.size()])[position];
+                WeighbridgeName= Weighbridge_spinner.getSelectedItem().toString();
+                WeighbridgeCode = dataAccessHandler.getOnlyOneValueFromDb(Queries.getInstance().getgetWeighbridgeCode(Integer.parseInt(WeighbridgeId)));
+
                 String selectedName = parent.getSelectedItem().toString();
                 Toast.makeText(GatepassinActivity.this, selectedName, Toast.LENGTH_SHORT).show();
 
-//
+                android.util.Log.v(LOG_TAG, "@@@ WeighbridgeName " + WeighbridgeName + " WeighbridgeId " + WeighbridgeId);
             }
 
 
@@ -196,7 +201,7 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
                     currentDateTime = sdf.format(new Date());
                     Log.d("currentDateTime", currentDateTime + "");
-                    GatePassCode = currentDateTime+"/"+ splitString[1]  +"/" + splitString[2] +"/" +splitString[3] + vehicleCategoryCode+ vehicleTypeCode+"MILYNG01";
+                    GatePassCode = currentDateTime+"/"+ splitString[1]  +"/" + splitString[2] +"/" +splitString[3] +"/"+ vehicleCategoryCode+ "/"+vehicleTypeCode+"/"+WeighbridgeId;
                     Log.d("GatePassCode", GatePassCode + "");
 //                    enablePrintBtn(false);
 //                    submit.setAlpha(0.5f);
@@ -216,9 +221,9 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
         List<LinkedHashMap> details = new ArrayList<>();
         LinkedHashMap map = new LinkedHashMap();
 
-        map.put("GatePassCode",GatePassCode );
-        map.put("GatePassTokenCode", qrvalue);
-        map.put("WeighbridgeId", "MILYNG01");
+        map.put("GatePassCode",currentDateTime + splitString[1] );
+        map.put("GatePassTokenCode", splitString[0]+splitString[1] );
+        map.put("WeighbridgeId", WeighbridgeId);
         map.put("VehicleTypeId", vehicleTypeCode);
         map.put("IsVehicleOut", false);
         map.put("CreatedByUserId", CommonConstants.USER_ID);
@@ -306,7 +311,7 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
         mPrinter.printText(" 3F OILPALM PVT LTD " + "\n");
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_CENTER);
         mPrinter.setCharacterMultiple(0, 1);
-        mPrinter.printText(" Gate In Pass  Receipt " + "\n");
+        mPrinter.printText(" Gate Pass-In " + "\n");
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_LEFT);
         mPrinter.setCharacterMultiple(0, 0);
         mPrinter.setLeftMargin(15, 15);
@@ -348,15 +353,16 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
         mPrinter.setCharacterMultiple(0, 1);
 
         String space = "-----------------------------------------------";
-//         String tokenNumber  =  "Token Number";
+        String tokenNumber  =  "WeighBridge";
         String spaceBuilderr = "\n";
-//
-//         mPrinter.printText(space);
-//         mPrinter.printText(spaceBuilderr);
-//         mPrinter.printText(tokenNumber);
-//         mPrinter.printText(spaceBuilderr);
-//         mPrinter.printText(GatePassSerialNumber);
-//         mPrinter.printText(spaceBuilderr);
+
+         mPrinter.printText(space);
+         mPrinter.printText(spaceBuilderr);
+         mPrinter.printText(tokenNumber);
+         mPrinter.printText(spaceBuilderr);
+         mPrinter.printText(spaceBuilderr);
+         mPrinter.printText(WeighbridgeCode);
+         mPrinter.printText(spaceBuilderr);
         mPrinter.printText(space);
         mPrinter.printText(spaceBuilderr);
 

@@ -617,7 +617,7 @@ public class Queries {
     }
 
     public String getGatepassRefresh() {
-        return "select * from GatePasswhere ServerUpdatedStatus = 0";
+        return "select * from GatePass where ServerUpdatedStatus = 0";
     }
     public String getFileRepositoryRefresh() {
         return "select * from FileRepository where ServerUpdatedStatus = 0";
@@ -968,7 +968,11 @@ public class Queries {
                 " FROM Pest where Code like '%" + plotCode + "%' ORDER BY ID DESC LIMIT 1";
     }
     public String getGatePassSerialNumber(final String date) {
-        return " select GatePassSerialNumber  as Maxnumber FROM  GatePassToken Where CreatedDate like '" + date + "' ORDER BY ID DESC LIMIT 1";
+        //return " select GatePassSerialNumber  as Maxnumber FROM  GatePassToken Where CreatedDate like '" + date + "' ORDER BY ID DESC LIMIT 1";
+        return "select Max(GatePassSerialNumber) from GatePassToken Where CreatedDate like '" + "%" +date+ "%" + "'  ORDER BY CreatedDate DESC LIMIT 1";
+
+        //return "SELECT MAX(GatePassSerialNumber) FROM GatePassToken WHERE CreatedDate >= '" + fromdate + "' AND CreatedDate < '" + todate + "'";
+
     }
     public String getMaxCropMaintenanceHistoryCode(final String plotCode, final String userId) {
         return "SELECT MAX(cast(substr(replace(code,PlotCOde,''), INSTR(replace(code,PlotCOde,''),'-') + 1, length(replace(code,PlotCOde,''))) as INTEGER)) as maxNumber , Code " +
@@ -1300,5 +1304,14 @@ public class Queries {
 
     public String getVehicleTypeonCategory(String TypeCdId) {
         return "SELECT * from LookUp Where LookUpTypeId = '"+TypeCdId+"'";
+    }
+
+    public String getgetWeighbridgeCode(int Id) {
+        return "select Code from MillWeighBridge where Id = '"+Id+"'";
+    }
+
+    public String getWeighbridgeDetails() {
+        return "Select * from MillWeighBridge mw " +
+                "Inner Join UserMillWeighBridgexref umw on mw.Id = umw.MillWeighBridgeId";
     }
 }

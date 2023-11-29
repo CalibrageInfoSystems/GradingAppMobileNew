@@ -185,8 +185,8 @@ public class CommonUtils {
         }
 
         //return deviceId;
-       return "351558072434071";  //myid
-         //return "351558072968326";
+       //return "351558072434071";  //myid
+         return "351558072968326";
     }
 
     //To get app version

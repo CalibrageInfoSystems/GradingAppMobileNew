@@ -153,8 +153,9 @@ public class DataBaseUpgrade {
                 " Code                         VARCHAR(25)             NOT NULL,\n" +
                 " Name            VARCHAR(100)             NOT NULL,\n" +
                 " IsActive    BOOLEAN       NOT NULL,\n" +
-                " UserId                     INT                 NOT NULL,\n" +
+                " CreatedByUserId                     INT                 NOT NULL,\n" +
                 " CreatedDate                      DATETIME               NOT NULL,\n" +
+
                 " UpdatedByUserId                    INT                  NOT NULL,\n" +
                 " UpdatedDate                      DATETIME               NOT NULL\n" +
                 " );";

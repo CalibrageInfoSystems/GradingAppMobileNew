@@ -26,7 +26,6 @@ public class GatepassoutActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         intviews();
         Setviews();
-
     }
 
     private void intviews() {
@@ -39,17 +38,18 @@ public class GatepassoutActivity extends AppCompatActivity {
         submit = findViewById(R.id.gatepassoutsubmit);
     }
     private void Setviews() {
-        splitString = qrvalue.split("/");
-
-        Log.d("Length", splitString.length  + "");
-
-        Log.d("String1", splitString[0] + "");
-        Log.d("String2", splitString[1] + "");
-        Log.d("String3", splitString[2] + "");
-        Log.d("String4", splitString[3] + "");
-
-        if (splitString.length > 4) {
-            Log.d("String5", splitString[4] + "");
-        }
+//        splitString = qrvalue.split("/");
+//
+//        Log.d("Length", splitString.length  + "");
+//        Log.d("Length", splitString.length  + "");
+//
+//        Log.d("String1", splitString[0] + "");
+//        Log.d("String2", splitString[1] + "");
+//        Log.d("String3", splitString[2] + "");
+//        Log.d("String4", splitString[3] + "");
+//
+//        if (splitString.length > 4) {
+//            Log.d("String5", splitString[4] + "");
+//        }
     }
 }

@@ -494,12 +494,12 @@ public class DataAccessHandler <T> {
         // String maxNum = getOnlyOneValueFromDb(query);
         String convertedNum = "";
         if (!TextUtils.isEmpty(maxNum)) {
-            convertedNum = CommonUtils.serialNumber(Integer.parseInt(maxNum) , 3);
+            convertedNum = CommonUtils.serialNumber(Integer.parseInt(maxNum) , 4);
         } else {
-            convertedNum = CommonUtils.serialNumber(1, 3);
+            convertedNum = CommonUtils.serialNumber(1, 4);
         }
         //   StringBuilder farmerCoder = new StringBuilder();
-        String finalNumber = StringUtils.leftPad(convertedNum,3,"0");
+        String finalNumber = StringUtils.leftPad(convertedNum,4,"0");
 
         Log.v(LOG_TAG, "@@@ finalNumber code " + finalNumber);
         return finalNumber;

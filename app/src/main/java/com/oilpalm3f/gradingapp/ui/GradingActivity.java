@@ -211,6 +211,8 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
             Log.d("String5", splitString[4] + "");
         }
 
+        Log.d("String6", splitString[5] + "");
+
 
         tokenNumber.setText(splitString[0] + "");
         millcode.setText(splitString[1] + "");
