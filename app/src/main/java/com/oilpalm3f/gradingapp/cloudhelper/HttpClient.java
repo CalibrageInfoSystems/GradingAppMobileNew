@@ -180,7 +180,7 @@ public class HttpClient {
 
                 HttpClientParams.setRedirecting(httpParams, true);
 
-                final HttpResponse response = client.execute(post);
+                       final HttpResponse response = client.execute(post);
                 final int statusCode = response.getStatusLine().getStatusCode();
 
                 if (statusCode == HttpStatus.SC_OK) {

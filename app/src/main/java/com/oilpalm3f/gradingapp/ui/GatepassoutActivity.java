@@ -2,13 +2,34 @@ package com.oilpalm3f.gradingapp.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentManager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.oilpalm3f.gradingapp.MainActivity;
 import com.oilpalm3f.gradingapp.R;
+import com.oilpalm3f.gradingapp.cloudhelper.ApplicationThread;
+import com.oilpalm3f.gradingapp.common.CommonConstants;
+import com.oilpalm3f.gradingapp.common.CommonUtils;
 import com.oilpalm3f.gradingapp.database.DataAccessHandler;
+import com.oilpalm3f.gradingapp.database.Queries;
+import com.oilpalm3f.gradingapp.datasync.helpers.DataSyncHelper;
+import com.oilpalm3f.gradingapp.dbmodels.Gatepassoutdetails;
+import com.oilpalm3f.gradingapp.dbmodels.UserDetails;
+import com.oilpalm3f.gradingapp.printer.PrinterChooserFragment;
+import com.oilpalm3f.gradingapp.utils.UiUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 public class GatepassoutActivity extends AppCompatActivity {
     private static final String LOG_TAG = GatepassinActivity.class.getName();
@@ -16,6 +37,7 @@ public class GatepassoutActivity extends AppCompatActivity {
     String[] splitString;
     private DataAccessHandler dataAccessHandler;
     Button   submit;
+    TextView InTime,vehiclenumber,tokennumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +58,19 @@ public class GatepassoutActivity extends AppCompatActivity {
             Log.d("QR Code Value is", qrvalue + "");
         }
         submit = findViewById(R.id.gatepassoutsubmit);
+        InTime = findViewById(R.id.intime);
+        vehiclenumber = findViewById(R.id.vehiclenumber);
+        tokennumber = findViewById(R.id.tokennumber);
+
     }
     private void Setviews() {
+        String query = Queries.getInstance().gatepassoutdetails(qrvalue);
+
+        final Gatepassoutdetails gatepassDetails = (Gatepassoutdetails) dataAccessHandler.getgatepassDetails(query, 0);
+     //   Log.e("=>gatepassDetails",gatepassDetails.getVehicleNumber() + "=="+ gatepassDetails.getCreatedDate());
+        tokennumber.setText(gatepassDetails.getGatePassSerialNumber()+"");
+        vehiclenumber.setText(gatepassDetails.getVehicleNumber()+"");
+        InTime.setText(gatepassDetails.getCreatedDate()+"");
 //        splitString = qrvalue.split("/");
 //
 //        Log.d("Length", splitString.length  + "");
@@ -51,5 +84,62 @@ public class GatepassoutActivity extends AppCompatActivity {
 //        if (splitString.length > 4) {
 //            Log.d("String5", splitString[4] + "");
 //        }
+
+
+        submit.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                String whereCondition = " where GatePassCode = '"+ qrvalue +"'" ;
+                List<LinkedHashMap> details = new ArrayList<>();
+                LinkedHashMap map = new LinkedHashMap();
+                map.put("UpdatedByUserId",Integer.parseInt(CommonConstants.USER_ID));
+                map.put("UpdatedDate",CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
+                map.put("IsVehicleOut",true);
+                map.put("ServerUpdatedStatus",0);
+                details.add(map);
+                dataAccessHandler.updateData("GatePass", details, true, whereCondition, new ApplicationThread.OnComplete<String>() {
+                    @Override
+                    public void execute(boolean success, String result, String msg) {
+                        if (success) {
+                            if (CommonUtils.isNetworkAvailable(GatepassoutActivity.this)) {
+                                DataSyncHelper.performRefreshTransactionsSync(GatepassoutActivity.this, new ApplicationThread.OnComplete() {
+                                    @Override
+                                    public void execute(boolean success, Object result, String msg) {
+                                        if (success) {
+                                            ApplicationThread.uiPost(LOG_TAG, "transactions sync message", new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    CommonConstants.IsLogin = false;
+                                                    UiUtils.showCustomToastMessage("Successfully data sent to server", GatepassoutActivity.this, 0);
+                                                    startActivity(new Intent(GatepassoutActivity.this, MainActivity.class));
+                                                }
+                                            });
+                                        } else {
+                                            ApplicationThread.uiPost(LOG_TAG, "transactions sync failed message", new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    UiUtils.showCustomToastMessage("Data sync failed", GatepassoutActivity.this, 1);
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
+                            } else {
+                                startActivity(new Intent(GatepassoutActivity.this, MainActivity.class));
+                            }
+
+                        } else {
+                            Toast.makeText(getApplicationContext(), "failed", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+
+
+
+
+            }
+        });
     }
-}
+                                                  }

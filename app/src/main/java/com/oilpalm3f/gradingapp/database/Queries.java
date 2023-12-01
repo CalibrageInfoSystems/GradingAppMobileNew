@@ -1314,4 +1314,10 @@ public class Queries {
         return "Select * from MillWeighBridge mw " +
                 "Inner Join UserMillWeighBridgexref umw on mw.Id = umw.MillWeighBridgeId";
     }
+
+    public String  gatepassoutdetails(String GatePassCode) {
+        return "select gpt.GatePassSerialNumber, gpt.VehicleNumber, gp.CreatedDate from GatePassToken gpt\n" +
+                "INNER JOIN GatePass gp on gp.GatePassTokenCode = gpt.GatePassTokenCode where gp.GatePassCode = '" + GatePassCode + "'";
+    }
+
 }

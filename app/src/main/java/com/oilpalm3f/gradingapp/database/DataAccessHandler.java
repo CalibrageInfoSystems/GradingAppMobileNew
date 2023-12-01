@@ -13,6 +13,7 @@ import com.oilpalm3f.gradingapp.cloudhelper.ApplicationThread;
 import com.oilpalm3f.gradingapp.common.CommonUtils;
 import com.oilpalm3f.gradingapp.dbmodels.GatePass;
 import com.oilpalm3f.gradingapp.dbmodels.GatePassToken;
+import com.oilpalm3f.gradingapp.dbmodels.Gatepassoutdetails;
 import com.oilpalm3f.gradingapp.dbmodels.GradingFileRepository;
 import com.oilpalm3f.gradingapp.dbmodels.GradingReportModel;
 import com.oilpalm3f.gradingapp.dbmodels.UserDetails;
@@ -30,6 +31,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 
 public class DataAccessHandler <T> {
@@ -562,6 +564,74 @@ public class DataAccessHandler <T> {
             Log.e(LOG_TAG, "@@@ getting GatePass details " + e.getMessage());
         }
         return (T) ((type == 0) ? gatePassdata : gatepasslist);
+    }
+
+
+    public T getgatepassDetails(final String query, int dataReturnType) {
+        Gatepassoutdetails Gatepassout_details = null;
+        Cursor cursor = null;
+        List Gatepassoutdetailslist = new ArrayList();
+        Log.v(LOG_TAG, "@@@ user details query " + query);
+        try {
+            cursor = mDatabase.rawQuery(query, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    Gatepassout_details = new Gatepassoutdetails();
+                    Gatepassout_details.setGatePassSerialNumber(cursor.getString(0));
+                    Gatepassout_details.setVehicleNumber(cursor.getString(1));
+                    Gatepassout_details.setCreatedDate(cursor.getString(2));
+
+                    if (dataReturnType == 1) {
+                        Gatepassoutdetailslist.add(Gatepassout_details);
+                    }
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "@@@ getting Gatepassoutdetailslist " + e.getMessage());
+        }
+        return (T) ((dataReturnType == 0) ? Gatepassout_details : Gatepassoutdetailslist);
+    }
+
+    public synchronized void updateData(String tableName, List<LinkedHashMap> list, Boolean isClaues, String whereCondition, final ApplicationThread.OnComplete<String> oncomplete) {
+        boolean isUpdateSuccess = false;
+        int checkCount = 0;
+        try {
+            for (int i = 0; i < list.size(); i++) {
+                checkCount++;
+                List<Map.Entry> entryList = new ArrayList<Map.Entry>((list.get(i)).entrySet());
+                String query = "update " + tableName + " set ";
+                String namestring = "";
+
+                System.out.println("\n==> Size of Entry list: " + entryList.size());
+                StringBuffer columns = new StringBuffer();
+                for (Map.Entry temp : entryList) {
+                    columns.append(temp.getKey());
+                    columns.append("='");
+                    columns.append(temp.getValue());
+                    columns.append("',");
+                }
+
+                namestring = columns.deleteCharAt(columns.length() - 1).toString();
+                query = query + namestring + "" + whereCondition;
+                mDatabase.execSQL(query);
+                isUpdateSuccess = true;
+                Log.v(LOG_TAG, "@@@ query for  " + query);
+            }
+        } catch (Exception e) {
+            checkCount++;
+            e.printStackTrace();
+            isUpdateSuccess = false;
+        } finally {
+            closeDataBase();
+            if (checkCount == list.size()) {
+                if (isUpdateSuccess) {
+                    Log.v(LOG_TAG, "@@@ data updated successfully for " + tableName);
+                    oncomplete.execute(true, null, "data updated successfully for " + tableName);
+                } else {
+                    oncomplete.execute(false, null, "data updation failed for " + tableName);
+                }
+            }
+        }
     }
 
 }
