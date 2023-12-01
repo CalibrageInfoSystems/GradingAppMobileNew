@@ -4,11 +4,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.drawable.Animatable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,7 +44,7 @@ public class GatepassoutActivity extends AppCompatActivity {
     private DataAccessHandler dataAccessHandler;
     Button   submit;
     TextView InTime,vehiclenumber,tokennumber;
-
+    int tokenexists;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +77,16 @@ public class GatepassoutActivity extends AppCompatActivity {
         tokennumber.setText(gatepassDetails.getGatePassSerialNumber()+"");
         vehiclenumber.setText(gatepassDetails.getVehicleNumber()+"");
         InTime.setText(gatepassDetails.getCreatedDate()+"");
+
+
+        tokenexists = dataAccessHandler.getOnlyOneIntValueFromDb(Queries.getInstance().getgateoutTokenExistQuery(qrvalue));
+    //  Log.d("tokenexists",tokenexists + "");
+
+        if (tokenexists == 1){
+
+            showDialog(GatepassoutActivity.this, "The gate pass-out process for this token has already been completed");
+
+        }
 //        splitString = qrvalue.split("/");
 //
 //        Log.d("Length", splitString.length  + "");
@@ -142,4 +158,31 @@ public class GatepassoutActivity extends AppCompatActivity {
             }
         });
     }
-                                                  }
+
+    public void showDialog(Activity activity, String msg) {
+        final Dialog dialog = new Dialog(activity, R.style.DialogSlideAnim);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        dialog.setCancelable(false);
+        dialog.setContentView(R.layout.dialog);
+        final ImageView img = dialog.findViewById(R.id.img_cross);
+
+        TextView text = (TextView) dialog.findViewById(R.id.text_dialog);
+        text.setText(msg);
+        Button dialogButton = (Button) dialog.findViewById(R.id.btn_dialog);
+        dialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                finish();
+            }
+        });
+        dialog.show();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ((Animatable) img.getDrawable()).start();
+            }
+        }, 500);
+    }
+}

@@ -4,16 +4,23 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.drawable.Animatable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.print.sdk.Barcode;
@@ -58,6 +65,7 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
     private LinkedHashMap<String, String> VehicleTypeMap, VehicleCategoryTypeMap,WeighbridgeIMap;
     private String vehicleCategoryCode, vehicleCategoryType;
     private String vehicleTypeCode, vehicleTypeName, WeighbridgeId, WeighbridgeCode, WeighbridgeName;
+    int tokenexists;
    //private String WeighbridgeCode, WeighbridgeName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +104,14 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
         if (splitString.length > 4) {
             Log.d("String5", splitString[4] + "");
         }
+        tokenexists = dataAccessHandler.getOnlyOneIntValueFromDb(Queries.getInstance().getgateinTokenExistQuery(splitString[0]+splitString[1]));
+        Log.d("tokenexists",tokenexists + "");
 
+        if (tokenexists == 1){
+
+            showDialog(GatepassinActivity.this, "The gate pass-in process for this token has already been completed");
+
+        }
 
 
         //Binding Data to Vehicle Category & On Item Selected Listener
@@ -214,6 +229,33 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
             }
         });
         
+    }
+
+    public void showDialog(Activity activity, String msg) {
+        final Dialog dialog = new Dialog(activity, R.style.DialogSlideAnim);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        dialog.setCancelable(false);
+        dialog.setContentView(R.layout.dialog);
+        final ImageView img = dialog.findViewById(R.id.img_cross);
+
+        TextView text = (TextView) dialog.findViewById(R.id.text_dialog);
+        text.setText(msg);
+        Button dialogButton = (Button) dialog.findViewById(R.id.btn_dialog);
+        dialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                finish();
+            }
+        });
+        dialog.show();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ((Animatable) img.getDrawable()).start();
+            }
+        }, 500);
     }
 
     private void savegatepassindetails() {

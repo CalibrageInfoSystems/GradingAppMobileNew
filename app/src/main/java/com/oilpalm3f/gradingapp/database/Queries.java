@@ -1320,4 +1320,15 @@ public class Queries {
                 "INNER JOIN GatePass gp on gp.GatePassTokenCode = gpt.GatePassTokenCode where gp.GatePassCode = '" + GatePassCode + "'";
     }
 
+    public String getgateinTokenExistQuery(String GatePassTokenCode) {
+
+
+        return "SELECT EXISTS ( SELECT 1 FROM GatePass WHERE GatePassTokenCode ='" + GatePassTokenCode + "')";
+    }
+
+    public String getgateoutTokenExistQuery(String GatePassCode) {
+
+
+        return "SELECT EXISTS ( SELECT 1 FROM GatePass WHERE GatePassCode ='" + GatePassCode + "' AND IsVehicleOut = true)";
+    }
 }
