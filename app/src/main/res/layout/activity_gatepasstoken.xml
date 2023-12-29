@@ -48,11 +48,14 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Vehicle Number *" />
+
                 <EditText
                     android:id="@+id/vehiclenumber"
                     style="@style/editTxt_normal"
                     android:layout_width="0dp"
                     android:layout_height="50dp"
+                    android:maxLength="20"
+                    android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
                     android:layout_weight="1"
 
                     />

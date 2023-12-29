@@ -408,7 +408,7 @@ import java.util.List;
          // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=141
 
 
-         byte[] sizeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x43, (byte)0x08};
+         byte[] sizeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x43, (byte)0x10};
 
 
          //          Hex     1D      28      6B      03      00      31      45      n

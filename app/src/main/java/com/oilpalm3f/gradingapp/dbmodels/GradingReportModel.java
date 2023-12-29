@@ -31,6 +31,15 @@ public class GradingReportModel {
     private String CreatedDatewithtime;
 
     private String VehicleNumber;
+    private String GatePassCode;
+
+    public String getGatePassCode() {
+        return GatePassCode;
+    }
+
+    public void setGatePassCode(String gatePassCode) {
+        GatePassCode = gatePassCode;
+    }
 
     public String getVehicleNumber() {
         return VehicleNumber;

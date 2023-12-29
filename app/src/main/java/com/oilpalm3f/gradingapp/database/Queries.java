@@ -1288,7 +1288,22 @@ public class Queries {
 
     public String getGradingReports(final String fromDate, final String toDate) {
         String  stquery="select TokenNumber, CCCode, FruitType, GrossWeight, TokenDate, UnRipen, UnderRipe, Ripen, OverRipe, Diseased, EmptyBunches, FFBQualityLong, FFBQualityMedium, FFBQualityShort, FFBQualityOptimum, LooseFruit, LooseFruitWeight, GraderName, RejectedBunches, CreatedByUserId,CreatedDate,DATE(substr(CreatedDate, 0, INSTR(CreatedDate, ' ') + 1)) " +
-                "date, VehicleNumber from FFBGrading where date between '"+fromDate+"' and '"+toDate+"'";
+                "date, VehicleNumber, GatePassCode from FFBGrading where date between '"+fromDate+"' and '"+toDate+"'";
+
+        return stquery;
+    }
+
+    public String getGatepasstokenReports(final String fromDate, final String toDate) {
+        String  stquery="select  GatePassTokenCode, VehicleNumber, GatePassSerialNumber, IsCollection, CreatedDate,DATE(substr(CreatedDate, 0, INSTR(CreatedDate, ' ') + 1)) " +
+                "date from GatePassToken where date between '"+fromDate+"' and '"+toDate+"'";
+
+        return stquery;
+    }
+
+
+    public String getGatepassInReports(final String fromDate, final String toDate) {
+        String  stquery=" select gp.GatePassCode, gp.GatePassTokenCode, gp.IsVehicleOut, gp.CreatedDate, gpt.IsCollection, mwb.Code as WBCode,mwb.Id as WBID, L.Name as VehicleType, gp.VehicleTypeId , T.Desc as VehicleCategory, T.TypeCdId as VehicleCategoryId, gpt.VehicleNumber, DATE(substr(gp.CreatedDate, 0, INSTR(gp.CreatedDate, ' ') + 1)) date from GatePass gp Inner Join MillWeighBridge mwb on mwb.Id = gp.WeighbridgeId Inner Join LookUp L on L.Id = gp.VehicleTypeId Inner JOIN TypeCdDmt T ON L.LookUpTypeId=T.TypeCdId\n" +
+                " Inner Join GatePassToken gpt on gpt.GatePassTokenCode  = gp.GatePassTokenCode where date between '"+fromDate+"' and '"+toDate+"'";
 
         return stquery;
     }
@@ -1299,11 +1314,11 @@ public class Queries {
     }
 
     public String getVehicleCategoryType() {
-        return "SELECT * from TypeCddmt Where Classtypeid = 68";
+        return "SELECT * from TypeCddmt Where Classtypeid = 68 AND IsActive = 'true'";
     }
 
     public String getVehicleTypeonCategory(String TypeCdId) {
-        return "SELECT * from LookUp Where LookUpTypeId = '"+TypeCdId+"'";
+        return "SELECT * from LookUp Where LookUpTypeId = '"+TypeCdId+"' AND IsActive = 'true'";
     }
 
     public String getgetWeighbridgeCode(int Id) {
@@ -1312,11 +1327,11 @@ public class Queries {
 
     public String getWeighbridgeDetails() {
         return "Select * from MillWeighBridge mw " +
-                "Inner Join UserMillWeighBridgexref umw on mw.Id = umw.MillWeighBridgeId";
+                "Inner Join UserMillWeighBridgexref umw on mw.Id = umw.MillWeighBridgeId where IsActive = 'true'";
     }
 
     public String  gatepassoutdetails(String GatePassCode) {
-        return "select gpt.GatePassSerialNumber, gpt.VehicleNumber, gp.CreatedDate from GatePassToken gpt\n" +
+        return "select gpt.GatePassSerialNumber, gpt.VehicleNumber, gp.CreatedDate from GatePassToken gpt \n" +
                 "INNER JOIN GatePass gp on gp.GatePassTokenCode = gpt.GatePassTokenCode where gp.GatePassCode = '" + GatePassCode + "'";
     }
 
@@ -1327,8 +1342,6 @@ public class Queries {
     }
 
     public String getgateoutTokenExistQuery(String GatePassCode) {
-
-
-        return "SELECT EXISTS ( SELECT 1 FROM GatePass WHERE GatePassCode ='" + GatePassCode + "' AND IsVehicleOut = true)";
+        return "SELECT EXISTS ( SELECT 1 FROM GatePass WHERE GatePassCode ='" + GatePassCode + "' AND IsVehicleOut = 'true')";
     }
 }

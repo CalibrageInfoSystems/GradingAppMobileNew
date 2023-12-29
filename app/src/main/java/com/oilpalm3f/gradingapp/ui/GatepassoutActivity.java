@@ -61,7 +61,7 @@ public class GatepassoutActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             qrvalue = extras.getString("qrvalue");
-            Log.d("QR Code Value is", qrvalue + "");
+            Log.d("QRCodeValueis", qrvalue + "");
         }
         submit = findViewById(R.id.gatepassoutsubmit);
         InTime = findViewById(R.id.intime);
@@ -72,20 +72,37 @@ public class GatepassoutActivity extends AppCompatActivity {
     private void Setviews() {
         String query = Queries.getInstance().gatepassoutdetails(qrvalue);
 
+        Log.d("qrvaluelength", String.valueOf(qrvalue.length()));
+
+        int qrvaluelength = Integer.parseInt(String.valueOf(qrvalue.length()));
+
+        Log.d("qrvaluelengthint", String.valueOf(qrvaluelength));
+
+        if (qrvaluelength == 18){
+
         final Gatepassoutdetails gatepassDetails = (Gatepassoutdetails) dataAccessHandler.getgatepassDetails(query, 0);
      //   Log.e("=>gatepassDetails",gatepassDetails.getVehicleNumber() + "=="+ gatepassDetails.getCreatedDate());
-        tokennumber.setText(gatepassDetails.getGatePassSerialNumber()+"");
-        vehiclenumber.setText(gatepassDetails.getVehicleNumber()+"");
-        InTime.setText(gatepassDetails.getCreatedDate()+"");
+
+        if (gatepassDetails != null) {
+            tokennumber.setText(gatepassDetails.getGatePassSerialNumber() + "");
+            vehiclenumber.setText(gatepassDetails.getVehicleNumber() + "");
+            InTime.setText(gatepassDetails.getCreatedDate() + "");
+        }else{
+
+            showDialog(GatepassoutActivity.this, "GatePass code doesn't exist in your tab");
+        }
 
 
         tokenexists = dataAccessHandler.getOnlyOneIntValueFromDb(Queries.getInstance().getgateoutTokenExistQuery(qrvalue));
     //  Log.d("tokenexists",tokenexists + "");
 
         if (tokenexists == 1){
-
             showDialog(GatepassoutActivity.this, "The gate pass-out process for this token has already been completed");
+        }
 
+        }else{
+
+            showDialog(GatepassoutActivity.this, "Invalid Gate-Out Token");
         }
 //        splitString = qrvalue.split("/");
 //

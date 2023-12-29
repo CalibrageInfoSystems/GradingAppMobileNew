@@ -132,7 +132,7 @@ public class GradingReportAdapter extends RecyclerView.Adapter<GradingReportAdap
         }
 
 //Created QrCode String
-        String hashString = mList.get(position).getTokenNumber()+"/"+mList.get(position).getCCCode()+"/"+fruitTypeNumber+"/"+mList.get(position).getGrossWeight()+"/"+ mList.get(position).getVehicleNumber()+"/"+mList.get(position).getCreatedDatewithtime()+"/"+
+        String hashString = mList.get(position).getTokenNumber()+"/"+mList.get(position).getCCCode()+"/"+fruitTypeNumber+"/"+mList.get(position).getGrossWeight()+"/"+ mList.get(position).getVehicleNumber()+"/"+mList.get(position).getGatePassCode()+"/"+mList.get(position).getCreatedDatewithtime()+"/"+
                 mList.get(position).getUnRipen()+"/"+mList.get(position).getUnderRipe()
                 +"/"+mList.get(position).getRipen()+"/"+mList.get(position).getOverRipe()+"/"+mList.get(position).getDiseased()+"/"+mList.get(position).getEmptyBunches()+"/"
                 +mList.get(position).getFFBQualityLong()+"/"+mList.get(position).getFFBQualityMedium()+"/"+mList.get(position).getFFBQualityShort()+"/"+

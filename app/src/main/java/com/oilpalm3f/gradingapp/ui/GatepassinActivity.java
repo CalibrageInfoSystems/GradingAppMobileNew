@@ -84,7 +84,7 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             qrvalue = extras.getString("qrvalue");
-            Log.d("QR Code Value is", qrvalue + "");
+            Log.d("GatePassInQRValue", qrvalue + "");
         }
         Weighbridge_spinner = findViewById(R.id.Weighbridge_spinner);
         vehicletype_spinner = findViewById(R.id.vehicletypespinner_spinner);
@@ -92,27 +92,29 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
         submit = findViewById(R.id.gatepasstokensubmit);
     }
     private void Setviews() {
+
         splitString = qrvalue.split("/");
 
-        Log.d("Length", splitString.length  + "");
+        if (splitString.length == 4) {
+
+        Log.d("Length", splitString.length + "");
 
         Log.d("String1", splitString[0] + "");
         Log.d("String2", splitString[1] + "");
         Log.d("String3", splitString[2] + "");
         Log.d("String4", splitString[3] + "");
 
-        if (splitString.length > 4) {
-            Log.d("String5", splitString[4] + "");
+        tokenexists = dataAccessHandler.getOnlyOneIntValueFromDb(Queries.getInstance().getgateinTokenExistQuery(splitString[0] + splitString[1]));
+        Log.d("tokenexists", tokenexists + "");
+
+        if (tokenexists == 1) {
+            showDialog(GatepassinActivity.this, "Gate Pass-In token already generated for this Serial Number");
         }
-        tokenexists = dataAccessHandler.getOnlyOneIntValueFromDb(Queries.getInstance().getgateinTokenExistQuery(splitString[0]+splitString[1]));
-        Log.d("tokenexists",tokenexists + "");
+    }
+        else{
 
-        if (tokenexists == 1){
-
-            showDialog(GatepassinActivity.this, "The gate pass-in process for this token has already been completed");
-
+            showDialog(GatepassinActivity.this, "Invalid Gate Pass-In Token");
         }
-
 
         //Binding Data to Vehicle Category & On Item Selected Listener
         WeighbridgeIMap =dataAccessHandler.getvechileData(Queries.getInstance().getVehicleCategoryType());
@@ -328,6 +330,11 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
             UiUtils.showCustomToastMessage("Please Select  Vehicle Category", GatepassinActivity.this, 0);
             return false;
         }
+        if (vehicletype_spinner.getSelectedItemPosition() == 0) {
+            UiUtils.showCustomToastMessage("Please Select  Vehicle Type", GatepassinActivity.this, 0);
+            return false;
+        }
+
         return true;
     }
     @Override
@@ -468,7 +475,7 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
         // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=141
 
 
-        byte[] sizeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x43, (byte)0x08};
+        byte[] sizeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x43, (byte)0x10};
 
 
         //          Hex     1D      28      6B      03      00      31      45      n

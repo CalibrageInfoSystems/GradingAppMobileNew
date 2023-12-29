@@ -71,6 +71,7 @@ public class DataBaseUpgrade {
         Log.d(LOG_TAG, "******* upgradeDataBase 2 ******" + Palm3FoilDatabase.DATA_VERSION);
 
         String column1 = "Alter Table FFBGrading Add VehicleNumber Varchar(50)";
+
         String fingerprintcolumn = "ALTER TABLE CollectionCenter Add IsFingerPrintReq BIT";
 
 
@@ -167,6 +168,8 @@ public class DataBaseUpgrade {
                 " MillWeighBridgeId                     INT                 NOT NULL\n" +
                 " );";
 
+        String column2 = "Alter Table FFBGrading Add GatePassCode Varchar(100)";
+
         try {
             db.execSQL(column1);
             db.execSQL(fingerprintcolumn);
@@ -178,6 +181,7 @@ public class DataBaseUpgrade {
             db.execSQL(LookUp);
             db.execSQL(MillWeighBridge);
             db.execSQL(UserMillWeighBridgexref);
+            db.execSQL(column2);
 
         } catch (Exception e) {
             e.printStackTrace();

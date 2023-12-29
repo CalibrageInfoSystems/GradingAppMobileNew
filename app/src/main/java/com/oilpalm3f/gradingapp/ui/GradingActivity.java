@@ -164,16 +164,16 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
         loosefruitweightLL = findViewById(R.id.loosefruitweightLL);
         submit = findViewById(R.id.gradingsubmit);
 
-        unripen.setFilters(new InputFilter[]{ new InputFilterMinMax("0", "100")});
-        underripe.setFilters(new InputFilter[]{ new InputFilterMinMax("0", "100")});
-        ripen.setFilters(new InputFilter[]{ new InputFilterMinMax("0", "100")});
-        overripe.setFilters(new InputFilter[]{ new InputFilterMinMax("0", "100")});
-        diseased.setFilters(new InputFilter[]{ new InputFilterMinMax("0", "100")});
-        emptybunches.setFilters(new InputFilter[]{ new InputFilterMinMax("0", "100")});
-        longstalk.setFilters(new InputFilter[]{ new InputFilterMinMax("0", "100")});
-        mediumstalk.setFilters(new InputFilter[]{ new InputFilterMinMax("0", "100")});
-        shortstalk.setFilters(new InputFilter[]{ new InputFilterMinMax("0", "100")});
-        optimum.setFilters(new InputFilter[]{ new InputFilterMinMax("0", "100")});
+        unripen.setFilters(new InputFilter[]{new InputFilterMinMax("0", "100")});
+        underripe.setFilters(new InputFilter[]{new InputFilterMinMax("0", "100")});
+        ripen.setFilters(new InputFilter[]{new InputFilterMinMax("0", "100")});
+        overripe.setFilters(new InputFilter[]{new InputFilterMinMax("0", "100")});
+        diseased.setFilters(new InputFilter[]{new InputFilterMinMax("0", "100")});
+        emptybunches.setFilters(new InputFilter[]{new InputFilterMinMax("0", "100")});
+        longstalk.setFilters(new InputFilter[]{new InputFilterMinMax("0", "100")});
+        mediumstalk.setFilters(new InputFilter[]{new InputFilterMinMax("0", "100")});
+        shortstalk.setFilters(new InputFilter[]{new InputFilterMinMax("0", "100")});
+        optimum.setFilters(new InputFilter[]{new InputFilterMinMax("0", "100")});
 
         gradingdoneby.setText(createdByName);
 
@@ -200,16 +200,20 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
         //Splitting the String
         splitString = qrvalue.split("/");
 
-        Log.d("Length", splitString.length  + "");
+
+        Log.d("splashslength", splitString.length + "");
+        Log.d("splashslength", splitString.length - 1+ "");
+
+        if (splitString.length == 6) {
 
         Log.d("String1", splitString[0] + "");
         Log.d("String2", splitString[1] + "");
         Log.d("String3", splitString[2] + "");
         Log.d("String4", splitString[3] + "");
-
-        if (splitString.length > 4) {
-            Log.d("String5", splitString[4] + "");
-        }
+        Log.d("String5", splitString[4] + "");
+//        if (splitString.length > 4) {
+//            Log.d("String5", splitString[4] + "");
+//        }
 
         Log.d("String6", splitString[5] + "");
 
@@ -218,12 +222,49 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
         millcode.setText(splitString[1] + "");
         type.setText(splitString[2] + "");
         grossweight.setText(splitString[3] + "");
+        vehiclenumber.setText(splitString[4] + "");
 
-        if (splitString.length > 4) {
-            vehiclenumber.setText(splitString[4] + "");
-        }
 
-       // tokendate.setText(splitString[4] + "");
+            //Getting the Token Date
+            firsteight = firstEight(splitString[0]);
+            firsteight = firsteight.substring(0, 4) + "-" + firsteight.substring(4, firsteight.length());
+            firsteight = firsteight.substring(0, 7) + "-" + firsteight.substring(7, firsteight.length());
+            firsteight = firsteight.substring(0, 10) + " " + firsteight.substring(10, firsteight.length());
+            firsteight = firsteight.substring(0, 13) + ":" + firsteight.substring(13, firsteight.length());
+            firsteight = firsteight.substring(0, 16) + ":" + firsteight.substring(16, firsteight.length());
+
+            Log.d("FirstEightString",firsteight);
+
+            if (splitString[2].equalsIgnoreCase("01")){
+
+                fruitType = "Collection";
+            }else{
+                fruitType = "Consignment";
+            }
+
+            Log.d("fruitType is", fruitType);
+
+            int token = Integer.parseInt(tokenNumber.getText().toString().substring(21));
+            Log.d("token", token + "");
+            String formattedToken = String.valueOf(token);
+
+            tokenCount = formattedToken;
+            Log.d("tokenCount", tokenCount + "");
+
+            weighBridgetokenNumber.setText(tokenCount);
+
+
+            tokenNumber.setText(splitString[0] + "");
+            millcode.setText(splitString[1] + "");
+            type.setText(fruitType);
+            grossweight.setText(splitString[3] + " (Kgs)");
+            tokendate.setText(firsteight + "");
+
+//        if (splitString.length > 4) {
+//            vehiclenumber.setText(splitString[4] + "");
+//        }
+
+        // tokendate.setText(splitString[4] + "");
 
 //        Log.d("String1", splitString[0] + "");
 //        Log.d("String2", splitString[1] + "");
@@ -234,12 +275,16 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
         //Checking whether token exists or not
 
         tokenexists = dataAccessHandler.getOnlyOneIntValueFromDb(Queries.getInstance().getTokenExistQuery(splitString[0], splitString[2], splitString[1]));
-        Log.d("tokenexists",tokenexists + "");
+        Log.d("tokenexists", tokenexists + "");
 
-        if (tokenexists == 1){
+        if (tokenexists == 1) {
 
             showDialog(GradingActivity.this, "Grading Already done for this Token");
 
+        }
+    }else{
+
+            showDialog(GradingActivity.this, "Invalid Grading Token");
         }
 //        tokenssize = dataAccessHandler.getOnlyOneIntValueFromDb(Queries.getInstance().getTokenSizeQuery());
 //        printtokenssize = tokenssize  + 1;
@@ -259,42 +304,6 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
 //        } catch (ParseException e) {
 //            e.printStackTrace();
 //        }
-
-
-        //Getting the Token Date
-        firsteight = firstEight(splitString[0]);
-        firsteight = firsteight.substring(0, 4) + "-" + firsteight.substring(4, firsteight.length());
-        firsteight = firsteight.substring(0, 7) + "-" + firsteight.substring(7, firsteight.length());
-        firsteight = firsteight.substring(0, 10) + " " + firsteight.substring(10, firsteight.length());
-        firsteight = firsteight.substring(0, 13) + ":" + firsteight.substring(13, firsteight.length());
-        firsteight = firsteight.substring(0, 16) + ":" + firsteight.substring(16, firsteight.length());
-
-        Log.d("FirstEightString",firsteight);
-
-        if (splitString[2].equalsIgnoreCase("01")){
-
-            fruitType = "Collection";
-        }else{
-            fruitType = "Consignment";
-        }
-
-        Log.d("fruitType is", fruitType);
-
-        int token = Integer.parseInt(tokenNumber.getText().toString().substring(21));
-        Log.d("token", token + "");
-        String formattedToken = String.valueOf(token);
-
-         tokenCount = formattedToken;
-        Log.d("tokenCount", tokenCount + "");
-
-        weighBridgetokenNumber.setText(tokenCount);
-
-
-        tokenNumber.setText(splitString[0] + "");
-        millcode.setText(splitString[1] + "");
-        type.setText(fruitType);
-        grossweight.setText(splitString[3] + " (Kgs)");
-        tokendate.setText(firsteight + "");
 
 
         //Binding data to isloosefruitavailable spinner and onclick listener
@@ -964,11 +973,10 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
         map.put("CreatedByUserId", CommonConstants.USER_ID);
         map.put("CreatedDate", CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
 
-        if (splitString.length >4){
             map.put("VehicleNumber", vehiclenumber.getText().toString());
-        }else{
-            map.put("VehicleNumber", "");
-        }
+
+            Log.d("GatePassCode", splitString[5]+ "");
+            map.put("GatePassCode",  splitString[5] + "");
 
         details.add(map);
 

@@ -2,14 +2,26 @@ package com.oilpalm3f.gradingapp;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentManager;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.drawable.Animatable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.oilpalm3f.gradingapp.cloudhelper.Log;
+import com.oilpalm3f.gradingapp.ui.GatePassInReportActivity;
+import com.oilpalm3f.gradingapp.ui.GatePassTokenReportActivity;
 import com.oilpalm3f.gradingapp.ui.GatepassinActivity;
 import com.oilpalm3f.gradingapp.ui.GatepasstokenActivity;
 import com.oilpalm3f.gradingapp.ui.GradingActivity;
@@ -23,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     ImageView scanImg, reportsImg, sync_logo,gatepassinimg,gatepasstokenimg,gatepassoutimg;
     LinearLayout synclyt;
+    private boolean doubleback = false;
 
 
     //Initializing the UI and there OnClick Listeners
@@ -54,8 +67,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                Intent syncintent = new Intent(MainActivity.this, GradingReportActivity.class);
-                startActivity(syncintent);
+                showDialog(MainActivity.this);
+
+//                Intent syncintent = new Intent(MainActivity.this, GradingReportActivity.class);
+//                startActivity(syncintent);
 
             }
         });
@@ -93,5 +108,82 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(gatepassintent);
             }
         });
+    }
+
+    public void showDialog(Activity activity) {
+        final Dialog dialog = new Dialog(activity, R.style.DialogSlideAnim);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        dialog.setCancelable(true);
+        dialog.setContentView(R.layout.selectreport);
+
+        RelativeLayout gradingreport = (RelativeLayout) dialog.findViewById(R.id.gradingreport);
+        RelativeLayout gatepasstoken = (RelativeLayout) dialog.findViewById(R.id.gatepasstoken);
+        RelativeLayout gatepassinreport = (RelativeLayout) dialog.findViewById(R.id.gatepassinreport);
+
+        gradingreport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                Intent syncintent = new Intent(MainActivity.this, GradingReportActivity.class);
+                startActivity(syncintent);
+
+            }
+        });
+
+        gatepasstoken.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                Intent syncintent = new Intent(MainActivity.this, GatePassTokenReportActivity.class);
+                startActivity(syncintent);
+
+
+                Toast.makeText(MainActivity.this, "gatepasstokenclicked", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        gatepassinreport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+                Intent syncintent = new Intent(MainActivity.this, GatePassInReportActivity.class);
+                startActivity(syncintent);
+
+                Toast.makeText(MainActivity.this, "gatepassinreportclicked", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        dialog.show();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+            }
+        }, 500);
+    }
+
+    @Override
+    public void onBackPressed() {
+        FragmentManager fm = getSupportFragmentManager();
+        int count = fm.getBackStackEntryCount();
+        if (count > 0) {
+            fm.popBackStack();
+        } else {
+            if (doubleback) {
+                finishAffinity();
+            } else {
+                doubleback = true;
+                Toast.makeText(this, "Press the back key again to close the app", Toast.LENGTH_SHORT).show();
+                //UiUtils.showCustomToastMessage("Press the back key again to close the app", this, 1);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        doubleback = false;
+                    }
+                }, 2000);
+            }
+        }
     }
 }

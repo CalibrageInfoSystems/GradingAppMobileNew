@@ -500,7 +500,7 @@
                     android:layout_width="0dp"
                     android:layout_height="50dp"
                     android:layout_weight="1"
-                    android:maxLength="10" />
+                    android:maxLength="5" />
             </LinearLayout>
 
             <LinearLayout

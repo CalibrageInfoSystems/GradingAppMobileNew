@@ -46,6 +46,12 @@
         android:usesCleartextTraffic="true"
         tools:replace="android:appComponentFactory">
         <activity
+            android:name=".ui.GatePassInReportActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.GatePassTokenReportActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.GatepassoutActivity"
             android:exported="false" />
         <activity

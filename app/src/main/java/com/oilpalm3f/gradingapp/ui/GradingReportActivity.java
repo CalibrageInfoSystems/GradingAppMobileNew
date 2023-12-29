@@ -53,7 +53,6 @@ public class GradingReportActivity extends AppCompatActivity implements onPrintO
     private Calendar myCalendar = Calendar.getInstance();
     private Button searchBtn;
     private String searchQuery = "";
-    public static String SearchCollectionwithoutPlotQuery = "";
     private String fromDateStr = "";
     private String toDateStr = "";
     private GradingReportModel selectedReport;
@@ -562,7 +561,7 @@ public class GradingReportActivity extends AppCompatActivity implements onPrintO
             rejectedbunches = selectedReport.getRejectedBunches();
         }
 
-        String hashString = selectedReport.getTokenNumber()+"/"+selectedReport.getCCCode()+"/"+fruitTypeNumber+"/"+selectedReport.getGrossWeight()+"/"+selectedReport.getVehicleNumber()+"/"+selectedReport.getCreatedDatewithtime()+"/"+
+        String hashString = selectedReport.getTokenNumber()+"/"+selectedReport.getCCCode()+"/"+fruitTypeNumber+"/"+selectedReport.getGrossWeight()+"/"+selectedReport.getVehicleNumber()+"/"+selectedReport.getGatePassCode()+"/"+selectedReport.getCreatedDatewithtime()+"/"+
                 selectedReport.getUnRipen()+"/"+selectedReport.getUnderRipe()
                 +"/"+selectedReport.getRipen()+"/"+selectedReport.getOverRipe()+"/"+selectedReport.getDiseased()+"/"+selectedReport.getEmptyBunches()+"/"
                 +selectedReport.getFFBQualityLong()+"/"+selectedReport.getFFBQualityMedium()+"/"+selectedReport.getFFBQualityShort()+"/"+
