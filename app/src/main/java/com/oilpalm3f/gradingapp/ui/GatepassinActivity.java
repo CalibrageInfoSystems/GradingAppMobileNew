@@ -7,10 +7,13 @@ import androidx.fragment.app.FragmentManager;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.graphics.drawable.Animatable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.SpannableString;
 import android.text.TextUtils;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -41,6 +44,7 @@ import com.oilpalm3f.gradingapp.printer.UsbDevicesListFragment;
 import com.oilpalm3f.gradingapp.printer.onPrinterType;
 import com.oilpalm3f.gradingapp.utils.UiUtils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -61,7 +65,7 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
     String GatePassSerialNumber;
     String fruitType;
     String GatePassCode;
-    String currentDateTime;
+    String currentDateTime, currentdateandtimeforprint, currentdateandtimeforcreate;
     private LinkedHashMap<String, String> VehicleTypeMap, VehicleCategoryTypeMap,WeighbridgeIMap;
     private String vehicleCategoryCode, vehicleCategoryType;
     private String vehicleTypeCode, vehicleTypeName, WeighbridgeId, WeighbridgeCode, WeighbridgeName;
@@ -72,7 +76,7 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gatepassin);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("Gate Pass In");
+        toolbar.setTitle("Gate Pass-In");
         setSupportActionBar(toolbar);
         intviews();
         Setviews();
@@ -94,8 +98,9 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
     private void Setviews() {
 
         splitString = qrvalue.split("/");
+        Log.d("splitString",splitString.length + "");
 
-        if (splitString.length == 4) {
+        if (splitString.length == 5 && splitString[0].length() == 25) {
 
         Log.d("Length", splitString.length + "");
 
@@ -103,8 +108,9 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
         Log.d("String2", splitString[1] + "");
         Log.d("String3", splitString[2] + "");
         Log.d("String4", splitString[3] + "");
+        Log.d("String5", splitString[4] + "");
 
-        tokenexists = dataAccessHandler.getOnlyOneIntValueFromDb(Queries.getInstance().getgateinTokenExistQuery(splitString[0] + splitString[1]));
+        tokenexists = dataAccessHandler.getOnlyOneIntValueFromDb(Queries.getInstance().getgateinTokenExistQuery(splitString[0]));
         Log.d("tokenexists", tokenexists + "");
 
         if (tokenexists == 1) {
@@ -118,6 +124,7 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
 
         //Binding Data to Vehicle Category & On Item Selected Listener
         WeighbridgeIMap =dataAccessHandler.getvechileData(Queries.getInstance().getVehicleCategoryType());
+
         VehicleCategoryTypeMap = dataAccessHandler.getvechileData(Queries.getInstance().getVehicleCategoryType());
         ArrayAdapter spinnerArrayAdaptervechilecategory = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
                 CommonUtils.fromMap(VehicleCategoryTypeMap, "Vehicle Category"));
@@ -184,8 +191,21 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
         Weighbridge_spinner.setClickable(false);
         Weighbridge_spinner.setAdapter(spinnerArrayAdapter);
 
-        int randomIndex = new Random().nextInt(WeighbridgeIMap.size());
-        Weighbridge_spinner.setSelection(randomIndex);
+
+        Log.d("WeighbridgeSize", WeighbridgeIMap.size() + "");
+
+        if (WeighbridgeIMap.size() == 0){
+
+            Toast.makeText(this, "No Weighbridge Assigned", Toast.LENGTH_SHORT).show();
+            finish();
+
+        }else{
+            int randomIndex = new Random().nextInt(WeighbridgeIMap.size());
+            Weighbridge_spinner.setSelection(randomIndex);
+        }
+
+//        int randomIndex = new Random().nextInt(WeighbridgeIMap.size());
+//        Weighbridge_spinner.setSelection(randomIndex);
 
         Weighbridge_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -196,7 +216,7 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
                 WeighbridgeCode = dataAccessHandler.getOnlyOneValueFromDb(Queries.getInstance().getgetWeighbridgeCode(Integer.parseInt(WeighbridgeId)));
 
                 String selectedName = parent.getSelectedItem().toString();
-                Toast.makeText(GatepassinActivity.this, selectedName, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(GatepassinActivity.this, selectedName, Toast.LENGTH_SHORT).show();
 
                 android.util.Log.v(LOG_TAG, "@@@ WeighbridgeName " + WeighbridgeName + " WeighbridgeId " + WeighbridgeId);
             }
@@ -217,8 +237,13 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
                 if (validation()){
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
                     currentDateTime = sdf.format(new Date());
+
+                    SimpleDateFormat sdf1 = new SimpleDateFormat(CommonConstants.DATE_FORMAT_5);
+                    currentdateandtimeforprint = sdf1.format(new Date());
+
                     Log.d("currentDateTime", currentDateTime + "");
-                    GatePassCode = currentDateTime+"/"+ splitString[1]  +"/" + splitString[2] +"/" +splitString[3] +"/"+ vehicleCategoryCode+ "/"+vehicleTypeCode+"/"+WeighbridgeId;
+                    Log.d("dateandtimeforprint", currentdateandtimeforprint + "");
+                    GatePassCode = currentDateTime+CommonConstants.TAB_ID+splitString[1]+splitString[2] +"/" + splitString[2] +"/" +splitString[3] +"/"+ splitString[4] +"/"+vehicleCategoryCode+ "/"+vehicleTypeCode+"/"+WeighbridgeId;
                     Log.d("GatePassCode", GatePassCode + "");
 //                    enablePrintBtn(false);
 //                    submit.setAlpha(0.5f);
@@ -265,16 +290,34 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
         List<LinkedHashMap> details = new ArrayList<>();
         LinkedHashMap map = new LinkedHashMap();
 
-        map.put("GatePassCode",currentDateTime + splitString[1] );
-        map.put("GatePassTokenCode", splitString[0]+splitString[1] );
+
+        String inputDate = currentdateandtimeforprint;
+        currentdateandtimeforcreate = convertDateFormat(inputDate);
+
+        Log.d("splitStringFruitType",  splitString[3]);
+
+        int fruitType = 0;
+
+        if ("true".contains(splitString[3])) {
+            fruitType = 0;
+        } else {
+            fruitType = 1;
+        }
+
+
+        map.put("GatePassCode",currentDateTime +CommonConstants.TAB_ID+ splitString[1] + splitString[2]);
+        map.put("GatePassTokenCode", splitString[0] );
         map.put("WeighbridgeId", WeighbridgeId);
         map.put("VehicleTypeId", vehicleTypeCode);
-        map.put("IsVehicleOut", false);
         map.put("CreatedByUserId", CommonConstants.USER_ID);
-        map.put("CreatedDate", CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
+        map.put("CreatedDate",currentdateandtimeforcreate);
         map.put("UpdatedByUserId", CommonConstants.USER_ID);
         map.put("UpdatedDate", CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
         map.put("ServerUpdatedStatus", false);
+        map.put("MillLocationTypeId ", splitString[1]);
+        map.put("SerialNumber", splitString[2]);
+        map.put("FruitType", fruitType);
+        map.put("VehicleNumber", splitString[4]);
 
 
         details.add(map);
@@ -353,13 +396,19 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
 
     public void printGAtepasstoken(PrinterInstance mPrinter, boolean isReprint, int printCount) {
 
+//        SpannableString spannableString = new SpannableString(WeighbridgeCode);
+//        int startIndex = WeighbridgeCode.indexOf("bold");
+//        int endIndex = startIndex + "bold".length();
+//        spannableString.setSpan(new StyleSpan(Typeface.BOLD), startIndex, endIndex, SpannableString.SPAN_INCLUSIVE_INCLUSIVE);
+
+
         mPrinter.init();
         StringBuilder sb = new StringBuilder();
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_CENTER);
         mPrinter.setCharacterMultiple(0, 1);
         mPrinter.printText(" 3F OILPALM PVT LTD " + "\n");
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_CENTER);
-        mPrinter.setCharacterMultiple(0, 1);
+        mPrinter.setCharacterMultiple(0, 0);
         mPrinter.printText(" Gate Pass-In " + "\n");
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_LEFT);
         mPrinter.setCharacterMultiple(0, 0);
@@ -367,10 +416,10 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
         sb.append("==============================================" + "\n");
 
         sb.append(" ");
-        sb.append(" Vehicle Number : ").append(splitString[3] + "").append("\n");
+        sb.append(" Vehicle Number : ").append(splitString[4] + "").append("\n");
         sb.append(" ");
 
-        if(splitString[2].equalsIgnoreCase("true")){
+        if(splitString[3].equalsIgnoreCase("true")){
             fruitType= "Collection";
         }else{
             fruitType= "Consignment";
@@ -383,7 +432,9 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
 
         sb.append(" Vehicle Type Name : ").append(vehicleTypeName + "").append("\n");
         sb.append(" ");
-        sb.append(" Date : ").append(CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_4) + "").append("\n");
+        sb.append(" Date : ").append(currentdateandtimeforprint + "").append("\n");
+
+        sb.append("  Created By : ").append(CommonConstants.USER_NAME + "").append("\n");
 
         mPrinter.printText(sb.toString());
 
@@ -405,37 +456,40 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
         String tokenNumber  =  "WeighBridge";
         String spaceBuilderr = "\n";
 
-         mPrinter.printText(space);
-         mPrinter.printText(spaceBuilderr);
-         mPrinter.printText(tokenNumber);
-         mPrinter.printText(spaceBuilderr);
-         mPrinter.printText(spaceBuilderr);
-         mPrinter.printText(WeighbridgeCode);
-         mPrinter.printText(spaceBuilderr);
+        mPrinter.printText(space);
+        mPrinter.printText(spaceBuilderr);
+        mPrinter.printText(tokenNumber + " - "+ WeighbridgeCode);
+        mPrinter.printText(spaceBuilderr);
         mPrinter.printText(space);
         mPrinter.printText(spaceBuilderr);
 
+//        if(CommonConstants.PrinterName.contains("AMIGOS")){
+//            Log.d(LOG_TAG,"########### NEW ##############");
+//            print_qr_code(mPrinter,GatePassCode);
+//        }else{
+//            Log.d(LOG_TAG,"########### OLD ##############");
+//            mPrinter.printBarCode(barcode);
+//        }
 
-        if(CommonConstants.PrinterName.contains("AMIGOS")){
+        if(CommonConstants.PrinterName.contains("G-8BT3 AMIGOS")){
             Log.d(LOG_TAG,"########### NEW ##############");
+            //mPrinter.setPrintModel(false,true,true,false);
+            print_qr_codee(mPrinter,GatePassCode);
+        }else if (CommonConstants.PrinterName.contains("AMIGOS")){
             print_qr_code(mPrinter,GatePassCode);
         }else{
             Log.d(LOG_TAG,"########### OLD ##############");
             mPrinter.printBarCode(barcode);
         }
+
+
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_CENTER);
         mPrinter.setCharacterMultiple(0, 1);
         //mPrinter.printText(qrCodeValue);
 
         String spaceBuilder = "\n" +
-                " " +
-                "\n" +
-                " " +
-                "\n" +
-                "\n" +
-                " " +
-                "\n" +
-                "\n";
+                " ";
+
         mPrinter.printText(spaceBuilder);
 
         boolean printSuccess = false;
@@ -475,7 +529,7 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
         // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=141
 
 
-        byte[] sizeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x43, (byte)0x10};
+        byte[] sizeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x43, (byte)0x5};
 
 
         //          Hex     1D      28      6B      03      00      31      45      n
@@ -509,6 +563,62 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
         mPrinter.sendByteData(printQR);
 
     }
+
+
+    public void print_qr_codee(PrinterInstance mPrinter,String qrdata)
+    {
+        int store_len = qrdata.length() + 3;
+        byte store_pL = (byte) (store_len % 256);
+        byte store_pH = (byte) (store_len / 256);
+
+
+        // QR Code: Select the modelc
+        //              Hex     1D      28      6B      04      00      31      41      n1(x32)     n2(x00) - size of model
+        // set n1 [49 x31, model 1] [50 x32, model 2] [51 x33, micro qr code]
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=140
+        byte[] modelQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x04, (byte)0x00, (byte)0x31, (byte)0x41, (byte)0x32, (byte)0x00};
+
+        // QR Code: Set the size of module
+        // Hex      1D      28      6B      03      00      31      43      n
+        // n depends on the printer
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=141
+
+
+        byte[] sizeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x43, (byte)0x1};
+
+
+        //          Hex     1D      28      6B      03      00      31      45      n
+        // Set n for error correction [48 x30 -> 7%] [49 x31-> 15%] [50 x32 -> 25%] [51 x33 -> 30%]
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=142
+        byte[] errorQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x45, (byte)0x31};
+
+
+        // QR Code: Store the data in the symbol storage area
+        // Hex      1D      28      6B      pL      pH      31      50      30      d1...dk
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=143
+        //                        1D          28          6B         pL          pH  cn(49->x31) fn(80->x50) m(48->x30) d1…dk
+        byte[] storeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, store_pL, store_pH, (byte)0x31, (byte)0x50, (byte)0x30};
+
+
+        // QR Code: Print the symbol data in the symbol storage area
+        // Hex      1D      28      6B      03      00      31      51      m
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=144
+        byte[] printQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x51, (byte)0x30};
+
+        // flush() runs the print job and clears out the print buffer
+//        flush();
+
+        // write() simply appends the data to the buffer
+        mPrinter.sendByteData(modelQR);
+
+        mPrinter.sendByteData(sizeQR);
+        mPrinter.sendByteData(errorQR);
+        mPrinter.sendByteData(storeQR);
+        mPrinter.sendByteData(qrdata.getBytes());
+        mPrinter.sendByteData(printQR);
+
+    }
+
     public void enablePrintBtn(final boolean enable) {
         ApplicationThread.uiPost(LOG_TAG, "updating ui", new Runnable() {
             @Override
@@ -542,6 +652,25 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
             bluetoothDevicesFragment.show(fm, "bluetooth fragment");
         }
 
+    }
+
+    public static String convertDateFormat(String inputDate) {
+        String outputDate = null;
+
+        try {
+            // Input format
+            SimpleDateFormat inputFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+            Date date = inputFormat.parse(inputDate);
+
+            // Output format
+            SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            outputDate = outputFormat.format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            // Handle parsing exception if needed
+        }
+
+        return outputDate;
     }
 
 }

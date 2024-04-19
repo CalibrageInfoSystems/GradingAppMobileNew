@@ -12,6 +12,7 @@ import android.util.Log;
 import com.oilpalm3f.gradingapp.cloudhelper.ApplicationThread;
 import com.oilpalm3f.gradingapp.common.CommonUtils;
 import com.oilpalm3f.gradingapp.dbmodels.GatePass;
+import com.oilpalm3f.gradingapp.dbmodels.GatePassOut;
 import com.oilpalm3f.gradingapp.dbmodels.GatePassToken;
 import com.oilpalm3f.gradingapp.dbmodels.GatepassInListModel;
 import com.oilpalm3f.gradingapp.dbmodels.GatepassTokenListModel;
@@ -364,6 +365,55 @@ public class DataAccessHandler <T> {
         }
     }
 
+    public T getGradingList(String query, int type) {
+        List<GradingReportModel> gradingReportDetails = new ArrayList<>();
+        Cursor cursor = null;
+        Log.v(LOG_TAG, "Query for getNotvisitedplotInfo " + query);
+        GradingReportModel grading_details = null;
+        try {
+            cursor = mDatabase.rawQuery(query, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    grading_details = new GradingReportModel();
+                    grading_details.setTokenNumber(cursor.getString(cursor.getColumnIndex("TokenNumber")));
+                    grading_details.setCCCode(cursor.getString(cursor.getColumnIndex("CCCode")));
+                    grading_details.setFruitType(cursor.getString(cursor.getColumnIndex("FruitType")));
+                    grading_details.setGrossWeight(cursor.getString(cursor.getColumnIndex("GrossWeight")));
+                    grading_details.setTokenDate(cursor.getString(cursor.getColumnIndex("TokenDate")));
+                    grading_details.setUnRipen(cursor.getInt(cursor.getColumnIndex("UnRipen")));
+                    grading_details.setUnderRipe(cursor.getInt(cursor.getColumnIndex("UnderRipe")));
+                    grading_details.setRipen(cursor.getInt(cursor.getColumnIndex("Ripen")));
+                    grading_details.setOverRipe(cursor.getInt(cursor.getColumnIndex("OverRipe")));
+                    grading_details.setDiseased(cursor.getInt(cursor.getColumnIndex("Diseased")));
+                    grading_details.setEmptyBunches(cursor.getInt(cursor.getColumnIndex("EmptyBunches")));
+                    grading_details.setFFBQualityLong(cursor.getInt(cursor.getColumnIndex("FFBQualityLong")));
+                    grading_details.setFFBQualityMedium(cursor.getInt(cursor.getColumnIndex("FFBQualityMedium")));
+                    grading_details.setFFBQualityShort(cursor.getInt(cursor.getColumnIndex("FFBQualityShort")));
+                    grading_details.setFFBQualityOptimum(cursor.getInt(cursor.getColumnIndex("FFBQualityOptimum")));
+                    grading_details.setLooseFruit(cursor.getString(cursor.getColumnIndex("LooseFruit")));
+                    grading_details.setLooseFruitWeight(cursor.getString(cursor.getColumnIndex("LooseFruitWeight")));
+                    grading_details.setGraderName(cursor.getString(cursor.getColumnIndex("GraderName")));
+                    grading_details.setRejectedBunches(cursor.getString(cursor.getColumnIndex("RejectedBunches")));
+                    grading_details.setCreatedDatewithtime(cursor.getString(cursor.getColumnIndex("CreatedDate")));
+                    grading_details.setCreatedDate(cursor.getString(cursor.getColumnIndex("date")));
+                    grading_details.setVehicleNumber(cursor.getString(cursor.getColumnIndex("VehicleNumber")));
+
+                    gradingReportDetails.add(grading_details);
+                } while (cursor.moveToNext());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return (T) ((type == 0) ? grading_details : gradingReportDetails);
+
+    }
+
 
     public void getGatepasstokenreportDetails(final String query, final ApplicationThread.OnComplete onComplete) {
         List<GatepassTokenListModel> gatepasstokenReportDetails = new ArrayList<>();
@@ -382,6 +432,9 @@ public class DataAccessHandler <T> {
                     gatepasstoken_details.setGatePassSerialNumber(cursor.getString(cursor.getColumnIndex("GatePassSerialNumber")));
                     gatepasstoken_details.setIsCollection(cursor.getString(cursor.getColumnIndex("IsCollection")));
                     gatepasstoken_details.setCreatedDate(cursor.getString(cursor.getColumnIndex("CreatedDate")));
+                    gatepasstoken_details.setMillLocation(cursor.getString(cursor.getColumnIndex("MillLocation")));
+                    gatepasstoken_details.setMillLocationTypeId(cursor.getInt(cursor.getColumnIndex("MillLocationTypeId")));
+                    gatepasstoken_details.setCreatedBy(cursor.getString(cursor.getColumnIndex("CreatedBy")));
 
                     gatepasstokenReportDetails.add(gatepasstoken_details);
                 } while (cursor.moveToNext());
@@ -401,6 +454,41 @@ public class DataAccessHandler <T> {
         }
     }
 
+
+    public T getGatpassserialList(String query, int type) {
+        List<GatepassTokenListModel> gatepasstokenlist = new ArrayList<>();
+        Cursor cursor = null;
+        Log.v(LOG_TAG, "Query for getNotvisitedplotInfo " + query);
+        GatepassTokenListModel gatepassseriallist = null;
+        try {
+            cursor = mDatabase.rawQuery(query, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    gatepassseriallist = new GatepassTokenListModel();
+                    gatepassseriallist.setGatePassTokenCode(cursor.getString(cursor.getColumnIndex("GatePassTokenCode")));
+                    gatepassseriallist.setVehicleNumber(cursor.getString(cursor.getColumnIndex("VehicleNumber")));
+                    gatepassseriallist.setGatePassSerialNumber(cursor.getString(cursor.getColumnIndex("GatePassSerialNumber")));
+                    gatepassseriallist.setIsCollection(cursor.getString(cursor.getColumnIndex("IsCollection")));
+                    gatepassseriallist.setCreatedDate(cursor.getString(cursor.getColumnIndex("CreatedDate")));
+                    gatepassseriallist.setMillLocation(cursor.getString(cursor.getColumnIndex("MillLocation")));
+                    gatepassseriallist.setMillLocationTypeId(cursor.getInt(cursor.getColumnIndex("MillLocationTypeId")));
+                    gatepassseriallist.setCreatedBy(cursor.getString(cursor.getColumnIndex("CreatedBy")));
+                    gatepasstokenlist.add(gatepassseriallist);
+                } while (cursor.moveToNext());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return (T) ((type == 0) ? gatepassseriallist : gatepasstokenlist);
+
+    }
+
     public void getGatepassInreportDetails(final String query, final ApplicationThread.OnComplete onComplete) {
         List<GatepassInListModel> gatepassInReportDetails = new ArrayList<>();
         Cursor cursor = null;
@@ -415,17 +503,19 @@ public class DataAccessHandler <T> {
                     GatepassInListModel gatepassin_details = new GatepassInListModel();
                     gatepassin_details.setGatePassCode(cursor.getString(cursor.getColumnIndex("GatePassCode")));
                     gatepassin_details.setGatePassTokenCode(cursor.getString(cursor.getColumnIndex("GatePassTokenCode")));
-                    gatepassin_details.setIsVehicleOut(cursor.getString(cursor.getColumnIndex("IsVehicleOut")));
                     gatepassin_details.setCreatedDate(cursor.getString(cursor.getColumnIndex("CreatedDate")));
                     gatepassin_details.setWBCode(cursor.getString(cursor.getColumnIndex("WBCode")));
                     gatepassin_details.setVehicleType(cursor.getString(cursor.getColumnIndex("VehicleType")));
                     gatepassin_details.setWBID(cursor.getString(cursor.getColumnIndex("WBID")));
                     gatepassin_details.setVehicleCategory(cursor.getString(cursor.getColumnIndex("VehicleCategory")));
-                    gatepassin_details.setIsCollection(cursor.getString(cursor.getColumnIndex("IsCollection")));
+                    gatepassin_details.setFruitType(cursor.getString(cursor.getColumnIndex("FruitType")));
                     gatepassin_details.setVehicleNumber(cursor.getString(cursor.getColumnIndex("VehicleNumber")));
-
                     gatepassin_details.setVehicleTypeId(cursor.getString(cursor.getColumnIndex("VehicleTypeId")));
                     gatepassin_details.setVehicleCategoryId(cursor.getString(cursor.getColumnIndex("VehicleCategoryId")));
+                    gatepassin_details.setMillLocation(cursor.getString(cursor.getColumnIndex("MillLocation")));
+                    gatepassin_details.setMillLocationTypeId(cursor.getInt(cursor.getColumnIndex("MillLocationTypeId")));
+                    gatepassin_details.setSerialNumber(cursor.getString(cursor.getColumnIndex("SerialNumber")));
+                    gatepassin_details.setCreatedBy(cursor.getString(cursor.getColumnIndex("CreatedBy")));
 
 
 
@@ -445,6 +535,47 @@ public class DataAccessHandler <T> {
 
             onComplete.execute(true, gatepassInReportDetails, "getting data");
         }
+    }
+
+    public T getGatpassinList(String query, int type) {
+        List<GatepassInListModel> gatepassinList = new ArrayList<>();
+        Cursor cursor = null;
+        Log.v(LOG_TAG, "Query for getNotvisitedplotInfo " + query);
+        GatepassInListModel gatepassin_details = null;
+        try {
+            cursor = mDatabase.rawQuery(query, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    gatepassin_details = new GatepassInListModel();
+                    gatepassin_details.setGatePassCode(cursor.getString(cursor.getColumnIndex("GatePassCode")));
+                    gatepassin_details.setGatePassTokenCode(cursor.getString(cursor.getColumnIndex("GatePassTokenCode")));
+                    gatepassin_details.setCreatedDate(cursor.getString(cursor.getColumnIndex("CreatedDate")));
+                    gatepassin_details.setWBCode(cursor.getString(cursor.getColumnIndex("WBCode")));
+                    gatepassin_details.setVehicleType(cursor.getString(cursor.getColumnIndex("VehicleType")));
+                    gatepassin_details.setWBID(cursor.getString(cursor.getColumnIndex("WBID")));
+                    gatepassin_details.setVehicleCategory(cursor.getString(cursor.getColumnIndex("VehicleCategory")));
+                    gatepassin_details.setFruitType(cursor.getString(cursor.getColumnIndex("FruitType")));
+                    gatepassin_details.setVehicleNumber(cursor.getString(cursor.getColumnIndex("VehicleNumber")));
+                    gatepassin_details.setVehicleTypeId(cursor.getString(cursor.getColumnIndex("VehicleTypeId")));
+                    gatepassin_details.setVehicleCategoryId(cursor.getString(cursor.getColumnIndex("VehicleCategoryId")));
+                    gatepassin_details.setMillLocation(cursor.getString(cursor.getColumnIndex("MillLocation")));
+                    gatepassin_details.setMillLocationTypeId(cursor.getInt(cursor.getColumnIndex("MillLocationTypeId")));
+                    gatepassin_details.setSerialNumber(cursor.getString(cursor.getColumnIndex("SerialNumber")));
+                    gatepassin_details.setCreatedBy(cursor.getString(cursor.getColumnIndex("CreatedBy")));
+                    gatepassinList.add(gatepassin_details);
+                } while (cursor.moveToNext());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+        return (T) ((type == 0) ? gatepassin_details : gatepassinList);
+
     }
 
 
@@ -556,17 +687,18 @@ public class DataAccessHandler <T> {
 
 
                     gatePassTokendata = new GatePassToken();
-
-
-
                     gatePassTokendata.setGatePassTokenCode(cursor.getString(cursor.getColumnIndex("GatePassTokenCode")));
                     gatePassTokendata.setVehicleNumber(cursor.getString(cursor.getColumnIndex("VehicleNumber")));
                     gatePassTokendata.setGatePassSerialNumber(cursor.getInt(cursor.getColumnIndex("GatePassSerialNumber")));
+
+                    Log.d("IsCollection", String.valueOf(cursor.getInt(cursor.getColumnIndex("IsCollection"))));
+
                     gatePassTokendata.setIsCollection(cursor.getInt(cursor.getColumnIndex("IsCollection")));
-//                    gatePassTokendata.setGrossWeight(cursor.getDouble(cursor.getColumnIndex("GrossWeight")));
+                    gatePassTokendata.setLocationId(cursor.getInt(cursor.getColumnIndex("MillLocationTypeId")));
                     gatePassTokendata.setCreatedByUserId(cursor.getInt(cursor.getColumnIndex("CreatedByUserId")));
                     gatePassTokendata.setCreatedDate(cursor.getString(cursor.getColumnIndex("CreatedDate")));
                     gatePassTokendata.setServerUpdatedStatus(0);
+
                     if (type == 1) {
                         gatepasslist.add(gatePassTokendata);
                         gatePassTokendata = null;
@@ -629,7 +761,6 @@ public class DataAccessHandler <T> {
             if (cursor != null && cursor.moveToFirst()) {
                 do {
 
-
                     gatePassdata = new GatePass();
                     gatePassdata.setGatePassCode(cursor.getString(cursor.getColumnIndex("GatePassCode")));
                     gatePassdata.setGatePassTokenCode(cursor.getString(cursor.getColumnIndex("GatePassTokenCode")));
@@ -637,9 +768,12 @@ public class DataAccessHandler <T> {
                     gatePassdata.setVehicleTypeId(cursor.getInt(cursor.getColumnIndex("VehicleTypeId")));
                     gatePassdata.setCreatedByUserId(cursor.getInt(cursor.getColumnIndex("CreatedByUserId")));
                     gatePassdata.setCreatedDate(cursor.getString(cursor.getColumnIndex("CreatedDate")));
-                    gatePassdata.setIsVehicleOut(cursor.getInt(cursor.getColumnIndex("VehicleTypeId")));
                     gatePassdata.setUpdatedByUserId(cursor.getInt(cursor.getColumnIndex("UpdatedByUserId")));
                     gatePassdata.setUpdatedDate(cursor.getString(cursor.getColumnIndex("UpdatedDate")));
+                    gatePassdata.setMillLocationTypeId(cursor.getInt(cursor.getColumnIndex("MillLocationTypeId")));
+                    gatePassdata.setSerialNumber(cursor.getInt(cursor.getColumnIndex("SerialNumber")));
+                    gatePassdata.setFruitType(cursor.getInt(cursor.getColumnIndex("FruitType")));
+                    gatePassdata.setVehicleNumber(cursor.getString(cursor.getColumnIndex("VehicleNumber")));
                     gatePassdata.setServerUpdatedStatus(0);
                     if (type == 1) {
                         gatepasslist.add(gatePassdata);
@@ -651,6 +785,34 @@ public class DataAccessHandler <T> {
             Log.e(LOG_TAG, "@@@ getting GatePass details " + e.getMessage());
         }
         return (T) ((type == 0) ? gatePassdata : gatepasslist);
+    }
+
+    public T getGatepassoutdetails(final String query, final int type) {
+        List<GatePassOut> gatepassoutlist = new ArrayList<>();
+        GatePassOut  gatePassoutdata= null;
+        Cursor cursor = null;
+        Log.v(LOG_TAG, "@@@ GatePass details query " + query);
+        try {
+            cursor = mDatabase.rawQuery(query, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+
+                    gatePassoutdata = new GatePassOut();
+                    gatePassoutdata.setGatePassCode(cursor.getString(cursor.getColumnIndex("GatePassCode")));
+                    gatePassoutdata.setCreatedByUserId(cursor.getInt(cursor.getColumnIndex("CreatedByUserId")));
+                    gatePassoutdata.setCreatedDate(cursor.getString(cursor.getColumnIndex("CreatedDate")));
+                    gatePassoutdata.setGatePassInTime(cursor.getString(cursor.getColumnIndex("GatePassInTime")));
+                    gatePassoutdata.setServerUpdatedStatus(0);
+                    if (type == 1) {
+                        gatepassoutlist.add(gatePassoutdata);
+                        gatePassoutdata = null;
+                    }
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "@@@ getting GatePass details " + e.getMessage());
+        }
+        return (T) ((type == 0) ? gatePassoutdata : gatepassoutlist);
     }
 
 
@@ -719,6 +881,29 @@ public class DataAccessHandler <T> {
                 }
             }
         }
+    }
+
+    //tp get single list data from db
+    public List<String> getSingleListData(final String query) {
+        Log.v(LOG_TAG, "@@@ Generic Query " + query);
+        List<String> mGenericData = new ArrayList<>();
+        Cursor genericDataQuery = null;
+        try {
+            genericDataQuery = mDatabase.rawQuery(query, null);
+            if (genericDataQuery.moveToFirst()) {
+                do {
+                    String plotCode = genericDataQuery.getString(0);
+                    mGenericData.add(plotCode);
+                } while (genericDataQuery.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.e(LOG_TAG, e.getMessage());
+        } finally {
+            if (null != genericDataQuery)
+                genericDataQuery.close();
+            closeDataBase();
+        }
+        return mGenericData;
     }
 
 }

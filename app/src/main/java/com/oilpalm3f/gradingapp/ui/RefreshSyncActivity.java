@@ -34,7 +34,7 @@ public class RefreshSyncActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = RefreshSyncActivity.class.getName();
 
-    private TextView tvgradingfilerepository,GatePassTokencount,GatePasscount;
+    private TextView tvgradingfilerepository,GatePassTokencount,GatePasscount, GatePassoutcount;
     private Button btnsend, btnmastersync, btnDBcopy;
     private DataAccessHandler dataAccessHandler;
     private boolean isDataUpdated = false;
@@ -52,6 +52,7 @@ public class RefreshSyncActivity extends AppCompatActivity {
         tvgradingfilerepository = findViewById(R.id.gradingrepcount);
         GatePassTokencount = findViewById(R.id.GatePassTokencount);
         GatePasscount = findViewById(R.id.GatePasscount);
+        GatePassoutcount = findViewById(R.id.GatePassoutcount);
         btnsend = findViewById(R.id.btsynctoserver);
         btnDBcopy = findViewById(R.id.btcopydatabase);
         btnmastersync = findViewById(R.id.btnmastersync);
@@ -174,6 +175,7 @@ public class RefreshSyncActivity extends AppCompatActivity {
             tvgradingfilerepository.setText(dataAccessHandler.getCountValue(Queries.getInstance().getRefreshCountQuery("FFBGradingRepository")));
             GatePassTokencount.setText(dataAccessHandler.getCountValue(Queries.getInstance().getRefreshCountQuery("GatePassToken")));
             GatePasscount.setText(dataAccessHandler.getCountValue(Queries.getInstance().getRefreshCountQuery("GatePass")));
+            GatePassoutcount.setText(dataAccessHandler.getCountValue(Queries.getInstance().getRefreshCountQuery("GatePassOut")));
             isDataUpdated = true;
         } catch (Exception e) {
             e.printStackTrace();

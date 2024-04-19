@@ -111,6 +111,7 @@ public class BluetoothDevicesFragment extends DialogFragment {
                 Log.v(LOG_TAG, "@@@ bt device address selected "+address);
                 Log.v(LOG_TAG, "@@@ bt device address selected "+address);
                 CommonConstants.PrinterName =  btArrayAdapter.getItem(position);
+                Log.d("PrinterName is: ", CommonConstants.PrinterName);
                 establishBtConnection(false);
                 dismiss();
             }

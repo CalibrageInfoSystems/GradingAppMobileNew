@@ -54,6 +54,7 @@
                     style="@style/editTxt_normal"
                     android:layout_width="0dp"
                     android:layout_height="50dp"
+                    android:textAllCaps="true"
                     android:maxLength="20"
                     android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
                     android:layout_weight="1"
@@ -88,6 +89,32 @@
                     android:layout_weight="1"
                     android:background="@drawable/spinner_bg" />
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/location_ll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/textlocation"
+                    style="@style/header_h1_text_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:text="Mill Location *" />
+
+                <Spinner
+                    android:id="@+id/location_spinner"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/spinner_bg" />
+            </LinearLayout>
+
 
 
 

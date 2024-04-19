@@ -204,7 +204,7 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
         Log.d("splashslength", splitString.length + "");
         Log.d("splashslength", splitString.length - 1+ "");
 
-        if (splitString.length == 6) {
+        if (splitString.length == 5 && splitString[0].length() == 26) {
 
         Log.d("String1", splitString[0] + "");
         Log.d("String2", splitString[1] + "");
@@ -215,7 +215,7 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
 //            Log.d("String5", splitString[4] + "");
 //        }
 
-        Log.d("String6", splitString[5] + "");
+       // Log.d("String6", splitString[5] + "");
 
 
         tokenNumber.setText(splitString[0] + "");
@@ -660,7 +660,7 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
         mPrinter.setCharacterMultiple(0, 1);
         mPrinter.printText(" 3F OILPALM PVT LTD " + "\n");
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_CENTER);
-        mPrinter.setCharacterMultiple(0, 1);
+        mPrinter.setCharacterMultiple(0, 0);
         mPrinter.printText(" FFB Grading Receipt" + "\n");
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_LEFT);
         mPrinter.setCharacterMultiple(0, 0);
@@ -676,7 +676,7 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
         sb.append(" ");
         sb.append(" Gross Weight(Kgs) : ").append(splitString[3] + "").append("\n");
         sb.append(" ");
-        sb.append(" Grading Date : ").append(CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_4) + "").append("\n");
+        sb.append(" Grading Date : ").append(CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_5) + "").append("\n");
 
         mPrinter.printText(sb.toString());
 
@@ -722,34 +722,37 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
 
         mPrinter.printText(space);
         mPrinter.printText(spaceBuilderr);
-        mPrinter.printText(tokenNumber);
-        mPrinter.printText(spaceBuilderr);
-        mPrinter.printText(tokenCount);
+        mPrinter.printText(tokenNumber + " - " + tokenCount);
         mPrinter.printText(spaceBuilderr);
         mPrinter.printText(space);
         mPrinter.printText(spaceBuilderr);
 
 
-        if(CommonConstants.PrinterName.contains("AMIGOS")){
+//        if(CommonConstants.PrinterName.contains("AMIGOS")){
+//            Log.d(LOG_TAG,"########### NEW ##############");
+//            print_qr_code(mPrinter,qrCodeValue);
+//        }else{
+//            Log.d(LOG_TAG,"########### OLD ##############");
+//            mPrinter.printBarCode(barcode);
+//        }
+
+        if(CommonConstants.PrinterName.contains("G-8BT3 AMIGOS")){
             Log.d(LOG_TAG,"########### NEW ##############");
+            //mPrinter.setPrintModel(false,true,true,false);
+            print_qr_codee(mPrinter,qrCodeValue);
+        }else if (CommonConstants.PrinterName.contains("AMIGOS")){
             print_qr_code(mPrinter,qrCodeValue);
         }else{
             Log.d(LOG_TAG,"########### OLD ##############");
             mPrinter.printBarCode(barcode);
         }
+
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_CENTER);
         mPrinter.setCharacterMultiple(0, 1);
         //mPrinter.printText(qrCodeValue);
 
         String spaceBuilder = "\n" +
-                " " +
-                "\n" +
-                " " +
-                "\n" +
-                "\n" +
-                " " +
-                "\n" +
-                "\n";
+                " ";
         mPrinter.printText(spaceBuilder);
 
         boolean printSuccess = false;
@@ -789,7 +792,61 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
         // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=141
 
 
-        byte[] sizeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x43, (byte)0x08};
+        byte[] sizeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x43, (byte)0x05};
+
+
+        //          Hex     1D      28      6B      03      00      31      45      n
+        // Set n for error correction [48 x30 -> 7%] [49 x31-> 15%] [50 x32 -> 25%] [51 x33 -> 30%]
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=142
+        byte[] errorQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x45, (byte)0x31};
+
+
+        // QR Code: Store the data in the symbol storage area
+        // Hex      1D      28      6B      pL      pH      31      50      30      d1...dk
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=143
+        //                        1D          28          6B         pL          pH  cn(49->x31) fn(80->x50) m(48->x30) d1…dk
+        byte[] storeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, store_pL, store_pH, (byte)0x31, (byte)0x50, (byte)0x30};
+
+
+        // QR Code: Print the symbol data in the symbol storage area
+        // Hex      1D      28      6B      03      00      31      51      m
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=144
+        byte[] printQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x51, (byte)0x30};
+
+        // flush() runs the print job and clears out the print buffer
+//        flush();
+
+        // write() simply appends the data to the buffer
+        mPrinter.sendByteData(modelQR);
+
+        mPrinter.sendByteData(sizeQR);
+        mPrinter.sendByteData(errorQR);
+        mPrinter.sendByteData(storeQR);
+        mPrinter.sendByteData(qrdata.getBytes());
+        mPrinter.sendByteData(printQR);
+
+    }
+
+    public void print_qr_codee(PrinterInstance mPrinter,String qrdata)
+    {
+        int store_len = qrdata.length() + 3;
+        byte store_pL = (byte) (store_len % 256);
+        byte store_pH = (byte) (store_len / 256);
+
+
+        // QR Code: Select the modelc
+        //              Hex     1D      28      6B      04      00      31      41      n1(x32)     n2(x00) - size of model
+        // set n1 [49 x31, model 1] [50 x32, model 2] [51 x33, micro qr code]
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=140
+        byte[] modelQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x04, (byte)0x00, (byte)0x31, (byte)0x41, (byte)0x32, (byte)0x00};
+
+        // QR Code: Set the size of module
+        // Hex      1D      28      6B      03      00      31      43      n
+        // n depends on the printer
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=141
+
+
+        byte[] sizeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x43, (byte)0x1};
 
 
         //          Hex     1D      28      6B      03      00      31      45      n
@@ -975,8 +1032,8 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
 
             map.put("VehicleNumber", vehiclenumber.getText().toString());
 
-            Log.d("GatePassCode", splitString[5]+ "");
-            map.put("GatePassCode",  splitString[5] + "");
+//            Log.d("GatePassCode", splitString[5]+ "");
+//            map.put("GatePassCode",  splitString[5] + "");
 
         details.add(map);
 

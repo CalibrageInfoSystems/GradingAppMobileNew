@@ -87,7 +87,7 @@
 
 
             <LinearLayout
-                android:id="@+id/vehicletypetype"
+                android:id="@+id/GatepassCode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -95,16 +95,16 @@
                 android:visibility="visible">
 
                 <TextView
-                    android:id="@+id/textvehicletype"
+                    android:id="@+id/textgatepasscode"
                     style="@style/header_h1_text_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_weight="1"
-                    android:text="Vehicle Number " />
+                    android:text="Gate Pass Code " />
 
                 <TextView
-                    android:id="@+id/vehiclenumber"
+                    android:id="@+id/gatepasscodetv"
                     android:layout_width="0dp"
                     style="@style/header_h1_text_title"
                     android:layout_height="wrap_content"

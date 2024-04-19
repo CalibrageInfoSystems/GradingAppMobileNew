@@ -8,6 +8,39 @@ public class GatepassTokenListModel {
     private String IsCollection;
     private String CreatedDate;
 
+    private int MillLocationTypeId;
+
+
+    private String MillLocation;
+
+
+    public int getMillLocationTypeId() {
+        return MillLocationTypeId;
+    }
+
+    public void setMillLocationTypeId(int millLocationTypeId) {
+        MillLocationTypeId = millLocationTypeId;
+    }
+
+    public String getMillLocation() {
+        return MillLocation;
+    }
+
+    public void setMillLocation(String millLocation) {
+        MillLocation = millLocation;
+    }
+
+    private String CreatedBy;
+
+
+    public String getCreatedBy() {
+        return CreatedBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        CreatedBy = createdBy;
+    }
+
     public String getGatePassTokenCode() {
         return GatePassTokenCode;
     }

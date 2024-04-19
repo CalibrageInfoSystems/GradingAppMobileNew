@@ -8,11 +8,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +41,7 @@ import com.oilpalm3f.gradingapp.utils.UiUtils;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -47,6 +51,8 @@ public class GatePassInReportActivity extends AppCompatActivity implements ongat
     private DataAccessHandler dataAccessHandler;
     private RecyclerView gatepassinList;
     private Button searchBtn;
+
+    private LinearLayoutManager layoutManager;
 
     private EditText fromDateEdt, toDateEdt;
     private Calendar myCalendar = Calendar.getInstance();
@@ -61,12 +67,25 @@ public class GatePassInReportActivity extends AppCompatActivity implements ongat
 
     private List<GatepassInListModel> mReportsList = new ArrayList<>();
 
-    private GatepassinlistAdapter gatepasstokenlistAdapter;
+    private GatepassinlistAdapter gatepassinlistAdapter;
 
     private static final String LOG_TAG = GatePassInReportActivity.class.getName();
 
     private BluetoothDevicesFragment bluetoothDevicesFragment = null;
     private UsbDevicesListFragment usbDevicesListFragment = null;
+
+    private EditText searchtext;
+    private ImageView clearsearch;
+    private android.widget.ProgressBar searchprogress;
+    private boolean isSearch = false;
+
+    String searchKey = "";
+
+
+
+    public static final int LIMIT = 30;
+    private int offset;
+    private boolean hasMoreItems = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,110 +98,62 @@ public class GatePassInReportActivity extends AppCompatActivity implements ongat
 
         dataAccessHandler = new DataAccessHandler(this);
         initUI();
+        setViews();
 
         String currentDate = CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY);
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
         fromDateEdt.setText(sdf.format(new Date()));
         toDateEdt.setText(sdf.format(new Date()));
 //
-        searchQuery = Queries.getInstance().getGatepassInReports(currentDate, currentDate);
-        updateLabel(0);
-        updateLabel(1);
-        getGatepassinReports(searchQuery);
+//        searchQuery = Queries.getInstance().getGatepassInReports(currentDate, currentDate);
+//        updateLabel(0);
+//        updateLabel(1);
+//        getGatepassinReports(searchQuery);
         CommonUtils.currentActivity = this;
-        gatepasstokenlistAdapter = new GatepassinlistAdapter(GatePassInReportActivity.this);
-        gatepasstokenlistAdapter.setonPrintSelected((GatePassInReportActivity.this));
-        gatepassinList.setLayoutManager(new LinearLayoutManager(GatePassInReportActivity.this, LinearLayoutManager.VERTICAL, false));
-        gatepassinList.setAdapter(gatepasstokenlistAdapter);
+        gatepassinlistAdapter = new GatepassinlistAdapter(GatePassInReportActivity.this, mReportsList);
+//        gatepassinList.setLayoutManager(new LinearLayoutManager(GatePassInReportActivity.this, LinearLayoutManager.VERTICAL, false));
+//        gatepassinList.setAdapter(gatepasstokenlistAdapter);
     }
 
-    private void getGatepassinReports(String searchQuery) {
+    private void setViews() {
 
-        ProgressBar.showProgressBar(this, "Please wait...");
-        ApplicationThread.bgndPost(LOG_TAG, "getting reports data", new Runnable() {
+        offset = offset + LIMIT;
+        searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
-                dataAccessHandler.getGatepassInreportDetails(searchQuery, new ApplicationThread.OnComplete<List<GatepassInListModel>>() {
+            public void onClick(View v) {
+                ProgressBar.showProgressBar(GatePassInReportActivity.this, "Please wait...");
+                mReportsList = (List<GatepassInListModel>) dataAccessHandler.getGatpassinList(Queries.getInstance().getGatepassInReports(LIMIT, offset,fromDateStr,toDateStr, searchKey), 1);
+                Collections.reverse(mReportsList);
+                ApplicationThread.bgndPost(LOG_TAG, "getting reports data", new Runnable() {
                     @Override
-                    public void execute(boolean success, final List<GatepassInListModel> reports, String msg) {
-                        ProgressBar.hideProgressBar();
-                        if (success) {
-                            if (reports != null && reports.size() > 0) {
-                                mReportsList.clear();
-                                mReportsList = reports;
-                                ApplicationThread.uiPost(LOG_TAG, "update ui", new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        int recordsSize = reports.size();
-                                        Log.v(LOG_TAG, "data size " + recordsSize);
-                                        if (recordsSize > 0) {
-                                            gatepasstokenlistAdapter.updateAdapter(reports);
-                                            tvNorecords.setVisibility(View.GONE);
-                                            gatepassinList.setVisibility(View.VISIBLE);
-                                            //  setTile(getString(R.string.collection_report) + " ("+recordsSize+")");
-                                        } else {
-                                            tvNorecords.setVisibility(View.VISIBLE);
-                                        }
-                                    }
-                                });
-                            } else {
-                                ApplicationThread.uiPost(LOG_TAG, "updating ui", new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        tvNorecords.setVisibility(View.VISIBLE);
-                                        Log.v(LOG_TAG, "@@@ No records found");
-                                        gatepassinList.setVisibility(View.GONE);
-                                    }
-                                });
-                            }
-                        } else {
-                            ApplicationThread.uiPost(LOG_TAG, "updating ui", new Runnable() {
-                                @Override
-                                public void run() {
-                                    tvNorecords.setVisibility(View.VISIBLE);
-                                    Log.v(LOG_TAG, "@@@ No records found");
-                                    gatepassinList.setVisibility(View.GONE);
+                    public void run() {
+
+                        ApplicationThread.uiPost(LOG_TAG, "", new Runnable() {
+                            @Override
+                            public void run() {
+                                ProgressBar.hideProgressBar();
+                                gatepassinlistAdapter = new GatepassinlistAdapter(GatePassInReportActivity.this, mReportsList);
+                                if (mReportsList != null && !mReportsList.isEmpty() && mReportsList.size()!= 0) {
+                                    gatepassinList.setVisibility(View.VISIBLE);
+                                    tvNorecords.setVisibility(View.GONE);
+                                    layoutManager = new LinearLayoutManager(GatePassInReportActivity.this, LinearLayoutManager.VERTICAL, false);
+                                    gatepassinList.setLayoutManager(layoutManager);
+
+                                    gatepassinList.setAdapter(gatepassinlistAdapter);
+                                    gatepassinlistAdapter.setonGatepassinPrintSelected((GatePassInReportActivity.this));
+
+                                    //   setTitle(alert_type, offset == 0 ? alertsVisitsInfoList.size() : offset);
                                 }
-                            });
-                        }
+                                else{
+                                    gatepassinList.setVisibility(View.GONE);
+                                    tvNorecords.setVisibility(View.VISIBLE);
+                                }
+                            }
+                        });
                     }
                 });
             }
         });
-    }
-
-
-    private void initUI() {
-        gatepassinList = (RecyclerView) findViewById(R.id.gatepass_in_list);
-        searchBtn = (Button) findViewById(R.id.searchBtn);
-
-        searchBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (TextUtils.isEmpty(fromDateStr) && TextUtils.isEmpty(toDateStr)) {
-                    UiUtils.showCustomToastMessage("Please select from or to dates", GatePassInReportActivity.this, 0);
-                } else if (isDateAfter(fromDateStr, toDateStr)){
-                    searchQuery = Queries.getInstance().getGatepassInReports(fromDateStr, toDateStr);
-                    if (null != gatepasstokenlistAdapter) {
-                        mReportsList.clear();
-                        gatepasstokenlistAdapter.notifyDataSetChanged();
-                    }
-                    getGatepassinReports(searchQuery);
-                }else{
-                    UiUtils.showCustomToastMessage("From date must be less than To date", GatePassInReportActivity.this, 1);
-                    mReportsList.clear();
-                    gatepasstokenlistAdapter.notifyDataSetChanged();
-
-                }
-            }
-        });
-        tvNorecords = (TextView) findViewById(R.id.no_records);
-        tvNorecords.setVisibility(View.GONE);
-
-        fromDateEdt = (EditText) findViewById(R.id.fromDate);
-        toDateEdt = (EditText) findViewById(R.id.toDate);
-
-        //From and To Date on Click listeners with DatePicker Dialogs
 
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -208,6 +179,11 @@ public class GatePassInReportActivity extends AppCompatActivity implements ongat
             }
         };
 
+        String dateFormatter = "yyyy-MM-dd";
+        SimpleDateFormat sdf2 = new SimpleDateFormat(dateFormatter, Locale.US);
+        fromDateStr = sdf2.format(myCalendar.getTime());
+        toDateStr = sdf2.format(myCalendar.getTime());
+
         toDateEdt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -227,6 +203,138 @@ public class GatePassInReportActivity extends AppCompatActivity implements ongat
                 datePickerDialog.show();
             }
         });
+
+        clearsearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isSearch = false;
+                mReportsList.clear();
+                searchtext.setText("");
+            }
+        });
+
+        searchtext.addTextChangedListener(mTextWatcher);
+
+        gatepassinlist(offset);
+    }
+
+
+    private TextWatcher mTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            Log.d("WhatisinSearch", "is :"+ s);
+            //
+            offset = 0;
+            ApplicationThread.uiPost(LOG_TAG, "search", new Runnable() {
+                @Override
+                public void run() {
+                    doSearch(s.toString().trim());
+                    if (s.toString().length() > 0) {
+                        clearsearch.setVisibility(View.VISIBLE);
+                    } else {
+                        clearsearch.setVisibility(View.GONE);
+                    }
+                }
+            }, 100);
+        }
+
+        @Override
+        public void afterTextChanged(final Editable s) {
+
+        }
+    };
+
+    public void doSearch(String searchQuery) {
+        Log.d("DoSearchQuery", "is :" +  searchQuery);
+        offset = 0;
+        hasMoreItems = true;
+        if (searchQuery !=null &  !TextUtils.isEmpty(searchQuery)  & searchQuery.length()  > 0) {
+
+            offset = 0;
+            isSearch = true;
+            searchKey = searchQuery.trim();
+            gatepassinlist(offset);
+        } else {
+            searchKey = "";
+            isSearch = false;
+            gatepassinlist(offset);
+        }
+    }
+
+//    private void getGatepassinReports(String searchQuery) {
+//
+//        ProgressBar.showProgressBar(this, "Please wait...");
+//        ApplicationThread.bgndPost(LOG_TAG, "getting reports data", new Runnable() {
+//            @Override
+//            public void run() {
+//                dataAccessHandler.getGatepassInreportDetails(searchQuery, new ApplicationThread.OnComplete<List<GatepassInListModel>>() {
+//                    @Override
+//                    public void execute(boolean success, final List<GatepassInListModel> reports, String msg) {
+//                        ProgressBar.hideProgressBar();
+//                        if (success) {
+//                            if (reports != null && reports.size() > 0) {
+//                                mReportsList.clear();
+//                                mReportsList = reports;
+//                                ApplicationThread.uiPost(LOG_TAG, "update ui", new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        int recordsSize = reports.size();
+//                                        Log.v(LOG_TAG, "data size " + recordsSize);
+//                                        if (recordsSize > 0) {
+//                                            gatepasstokenlistAdapter.updateAdapter(reports);
+//                                            tvNorecords.setVisibility(View.GONE);
+//                                            gatepassinList.setVisibility(View.VISIBLE);
+//                                            //  setTile(getString(R.string.collection_report) + " ("+recordsSize+")");
+//                                        } else {
+//                                            tvNorecords.setVisibility(View.VISIBLE);
+//                                        }
+//                                    }
+//                                });
+//                            } else {
+//                                ApplicationThread.uiPost(LOG_TAG, "updating ui", new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        tvNorecords.setVisibility(View.VISIBLE);
+//                                        Log.v(LOG_TAG, "@@@ No records found");
+//                                        gatepassinList.setVisibility(View.GONE);
+//                                    }
+//                                });
+//                            }
+//                        } else {
+//                            ApplicationThread.uiPost(LOG_TAG, "updating ui", new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    tvNorecords.setVisibility(View.VISIBLE);
+//                                    Log.v(LOG_TAG, "@@@ No records found");
+//                                    gatepassinList.setVisibility(View.GONE);
+//                                }
+//                            });
+//                        }
+//                    }
+//                });
+//            }
+//        });
+//    }
+
+
+    private void initUI() {
+        gatepassinList = (RecyclerView) findViewById(R.id.gatepass_in_list);
+        searchBtn = (Button) findViewById(R.id.searchBtn);
+
+        tvNorecords = (TextView) findViewById(R.id.no_records);
+        tvNorecords.setVisibility(View.GONE);
+
+        fromDateEdt = (EditText) findViewById(R.id.fromDate);
+        toDateEdt = (EditText) findViewById(R.id.toDate);
+
+        searchtext = (EditText) findViewById(R.id.searchtext);
+        clearsearch = (ImageView) findViewById(R.id.clearsearch);
+        searchprogress = (android.widget.ProgressBar) findViewById(R.id.searchprogress);
+
     }
 
     //Update the from and to date labels
@@ -288,12 +396,22 @@ public class GatePassInReportActivity extends AppCompatActivity implements ongat
 
         String fruitType;
 
-        Log.d("Collection", selectedReport.getIsCollection() + "");
+        Log.d("Collection", selectedReport.getFruitType() + "");
 
-        if ("true".equals(selectedReport.getIsCollection())) {
+        if ("0".equals(selectedReport.getFruitType())) {
             fruitType = "Collection";
         } else {
             fruitType = "Consignment";
+        }
+
+        String printfruitType;
+
+        Log.d("Collection", selectedReport.getFruitType() + "");
+
+        if ("0".equals(selectedReport.getFruitType())) {
+            printfruitType = "true";
+        } else {
+            printfruitType = "false";
         }
 
         //int token = Integer.parseInt(selectedReport.getGatePassCode());
@@ -320,8 +438,8 @@ public class GatePassInReportActivity extends AppCompatActivity implements ongat
         mPrinter.setCharacterMultiple(0, 1);
         mPrinter.printText(" 3F OILPALM PVT LTD " + "\n");
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_CENTER);
-        mPrinter.setCharacterMultiple(0, 1);
-        mPrinter.printText(" Duplicate Copy of Gate Pass-In Number " + "\n");
+        mPrinter.setCharacterMultiple(0, 0);
+        mPrinter.printText(" Duplicate Copy of Gate Pass-In " + "\n");
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_LEFT);
         mPrinter.setCharacterMultiple(0, 0);
         mPrinter.setLeftMargin(15, 15);
@@ -341,6 +459,8 @@ public class GatePassInReportActivity extends AppCompatActivity implements ongat
         sb.append(" ");
         sb.append(" Date : ").append(selectedReport.getCreatedDate() + "").append("\n");
 
+        sb.append("  Created By : ").append(selectedReport.getCreatedBy() + "").append("\n");
+
         mPrinter.printText(sb.toString());
 
 
@@ -359,7 +479,7 @@ public class GatePassInReportActivity extends AppCompatActivity implements ongat
         Log.d("serialNumber", serialNumber + "");
 
 
-        String qrCodeValue = datetime +"/" +serialNumber+"/" +selectedReport.getIsCollection()+"/" + selectedReport.getVehicleNumber()
+        String qrCodeValue = selectedReport.getGatePassCode() +"/" +selectedReport.getSerialNumber()+"/" +printfruitType+"/" + selectedReport.getVehicleNumber()
                 + "/" + selectedReport.getVehicleCategoryId()+"/" +selectedReport.getVehicleTypeId()+"/" + selectedReport.getWBID();
 
         // String qrCodeValue =  currentDateTime +"/"+ GatePassSerialNumber +"/" +selectedfruittype+"/" + vehiclenumber.getText().toString();
@@ -370,39 +490,51 @@ public class GatePassInReportActivity extends AppCompatActivity implements ongat
         mPrinter.setCharacterMultiple(0, 1);
 
         String space = "-----------------------------------------------";
-        String tokenNumber  =  "Token Number";
+        String tokenNumber  =  "WeighBridge";
         String spaceBuilderr = "\n";
 
+//        mPrinter.printText(space);
+//        mPrinter.printText(spaceBuilderr);
+//        mPrinter.printText(tokenNumber);
+//        mPrinter.printText(spaceBuilderr);
+//        mPrinter.printText(selectedReport.getWBCode());
+//        mPrinter.printText(spaceBuilderr);
+//        mPrinter.printText(space);
+//        mPrinter.printText(spaceBuilderr);
+
         mPrinter.printText(space);
         mPrinter.printText(spaceBuilderr);
-        mPrinter.printText(tokenNumber);
-        mPrinter.printText(spaceBuilderr);
-        mPrinter.printText(selectedReport.getWBCode());
+        mPrinter.printText(tokenNumber + " - "+ selectedReport.getWBCode());
         mPrinter.printText(spaceBuilderr);
         mPrinter.printText(space);
         mPrinter.printText(spaceBuilderr);
 
+//
+//        if(CommonConstants.PrinterName.contains("AMIGOS")){
+//            android.util.Log.d(LOG_TAG,"########### NEW ##############");
+//            print_qr_code(mPrinter,qrCodeValue);
+//        }else{
+//            android.util.Log.d(LOG_TAG,"########### OLD ##############");
+//            mPrinter.printBarCode(barcode);
+//        }
 
-        if(CommonConstants.PrinterName.contains("AMIGOS")){
+        if(CommonConstants.PrinterName.contains("G-8BT3 AMIGOS")){
             android.util.Log.d(LOG_TAG,"########### NEW ##############");
+            //mPrinter.setPrintModel(false,true,true,false);
+            print_qr_codee(mPrinter,qrCodeValue);
+        }else if (CommonConstants.PrinterName.contains("AMIGOS")){
             print_qr_code(mPrinter,qrCodeValue);
         }else{
             android.util.Log.d(LOG_TAG,"########### OLD ##############");
             mPrinter.printBarCode(barcode);
         }
+
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_CENTER);
         mPrinter.setCharacterMultiple(0, 1);
         //mPrinter.printText(qrCodeValue);
 
         String spaceBuilder = "\n" +
-                " " +
-                "\n" +
-                " " +
-                "\n" +
-                "\n" +
-                " " +
-                "\n" +
-                "\n";
+                " " ;
         mPrinter.printText(spaceBuilder);
 
         boolean printSuccess = false;
@@ -436,6 +568,60 @@ public class GatePassInReportActivity extends AppCompatActivity implements ongat
             bluetoothDevicesFragment.setOnDeviceSelected(this);
             bluetoothDevicesFragment.show(fm, "bluetooth fragment");
         }
+    }
+
+    public void print_qr_codee(PrinterInstance mPrinter,String qrdata)
+    {
+        int store_len = qrdata.length() + 3;
+        byte store_pL = (byte) (store_len % 256);
+        byte store_pH = (byte) (store_len / 256);
+
+
+        // QR Code: Select the modelc
+        //              Hex     1D      28      6B      04      00      31      41      n1(x32)     n2(x00) - size of model
+        // set n1 [49 x31, model 1] [50 x32, model 2] [51 x33, micro qr code]
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=140
+        byte[] modelQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x04, (byte)0x00, (byte)0x31, (byte)0x41, (byte)0x32, (byte)0x00};
+
+        // QR Code: Set the size of module
+        // Hex      1D      28      6B      03      00      31      43      n
+        // n depends on the printer
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=141
+
+
+        byte[] sizeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x43, (byte)0x1};
+
+
+        //          Hex     1D      28      6B      03      00      31      45      n
+        // Set n for error correction [48 x30 -> 7%] [49 x31-> 15%] [50 x32 -> 25%] [51 x33 -> 30%]
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=142
+        byte[] errorQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x45, (byte)0x31};
+
+
+        // QR Code: Store the data in the symbol storage area
+        // Hex      1D      28      6B      pL      pH      31      50      30      d1...dk
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=143
+        //                        1D          28          6B         pL          pH  cn(49->x31) fn(80->x50) m(48->x30) d1…dk
+        byte[] storeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, store_pL, store_pH, (byte)0x31, (byte)0x50, (byte)0x30};
+
+
+        // QR Code: Print the symbol data in the symbol storage area
+        // Hex      1D      28      6B      03      00      31      51      m
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=144
+        byte[] printQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x51, (byte)0x30};
+
+        // flush() runs the print job and clears out the print buffer
+//        flush();
+
+        // write() simply appends the data to the buffer
+        mPrinter.sendByteData(modelQR);
+
+        mPrinter.sendByteData(sizeQR);
+        mPrinter.sendByteData(errorQR);
+        mPrinter.sendByteData(storeQR);
+        mPrinter.sendByteData(qrdata.getBytes());
+        mPrinter.sendByteData(printQR);
+
     }
 
 //    @Override
@@ -473,7 +659,7 @@ public class GatePassInReportActivity extends AppCompatActivity implements ongat
         // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=141
 
 
-        byte[] sizeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x43, (byte)0x10};
+        byte[] sizeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x43, (byte)0x05};
 
 
         //          Hex     1D      28      6B      03      00      31      45      n
@@ -532,5 +718,46 @@ public class GatePassInReportActivity extends AppCompatActivity implements ongat
         printerChooserFragment.setPrinterType(this);
         printerChooserFragment.show(fm, "bluetooth fragment");
 
+    }
+
+    private void gatepassinlist(final int offset) {
+        //ProgressBar.showProgressBar(this, "Please wait...");
+
+        if (searchprogress != null) {
+            searchprogress.setVisibility(View.VISIBLE);
+        }
+        ApplicationThread.bgndPost(LOG_TAG, "notvisitedplots", new Runnable() {
+            @Override
+            public void run() {
+
+                mReportsList = (List<GatepassInListModel>) dataAccessHandler.getGatpassinList(Queries.getInstance().getGatepassInReports(LIMIT, offset,fromDateStr,toDateStr, searchKey), 1);
+                Collections.reverse(mReportsList);
+
+                ApplicationThread.uiPost(LOG_TAG, "", new Runnable() {
+                    @Override
+                    public void run() {
+                        //ProgressBar.hideProgressBar();
+                        searchprogress.setVisibility(View.GONE);
+                        gatepassinlistAdapter = new GatepassinlistAdapter(GatePassInReportActivity.this, mReportsList);
+                        if (mReportsList != null && !mReportsList.isEmpty()) {
+                            gatepassinList.setVisibility(View.VISIBLE);
+                            tvNorecords.setVisibility(View.GONE);
+                            layoutManager = new LinearLayoutManager(GatePassInReportActivity.this, LinearLayoutManager.VERTICAL, false);
+                            gatepassinList.setLayoutManager(layoutManager);
+
+                            gatepassinList.setAdapter(gatepassinlistAdapter);
+                            gatepassinlistAdapter.setonGatepassinPrintSelected((GatePassInReportActivity.this));
+
+                            //   setTitle(alert_type, offset == 0 ? alertsVisitsInfoList.size() : offset);
+                        }
+                        else{
+                            gatepassinList.setVisibility(View.GONE);
+                            tvNorecords.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+
+            }
+        });
     }
 }

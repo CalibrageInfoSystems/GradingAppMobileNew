@@ -80,13 +80,12 @@
             android:weightSum="2">
 
             <LinearLayout
-                android:id="@+id/reportsRel"
+                android:id="@+id/grading_ll"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:orientation="vertical"
-
                 android:visibility="visible"
                 android:weightSum="1">
 
@@ -104,7 +103,7 @@
                     style="@style/moduleHomeBtnStyle"
                     android:layout_below="@+id/scanImg"
                     android:layout_gravity="center"
-                    android:text="Scan QR"
+                    android:text="Grading"
                     android:textColor="@color/black" />
 
             </LinearLayout>
@@ -149,7 +148,7 @@
             android:weightSum="2">
 
             <LinearLayout
-                android:id="@+id/reportsRel_2"
+                android:id="@+id/gatepassserial_ll"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -173,13 +172,13 @@
                     style="@style/moduleHomeBtnStyle"
                     android:layout_below="@+id/scanImg"
                     android:layout_gravity="center"
-                    android:text="Gate Pass Token"
+                    android:text="Gate Pass Serial Number"
                     android:textColor="@color/black" />
 
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/reportsRel_5"
+                android:id="@+id/gatepassin_ll"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -202,7 +201,7 @@
                     style="@style/moduleHomeBtnStyle"
                     android:layout_below="@+id/scanImg"
                     android:layout_gravity="center"
-                    android:text="Gate Pass In"
+                    android:text="Gate Pass-In"
                     android:textColor="@color/black" />
 
             </LinearLayout>
@@ -217,7 +216,7 @@
 
 
             <LinearLayout
-                android:id="@+id/reportsRel_4"
+                android:id="@+id/gatepassout_ll"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

@@ -8,7 +8,43 @@ public class GatePass {
     private int VehicleTypeId;
     private int CreatedByUserId;
     private String CreatedDate;
-    private int IsVehicleOut;
+
+    private int MillLocationTypeId;
+    private int SerialNumber;
+    private int FruitType;
+    private String VehicleNumber;
+
+    public int getMillLocationTypeId() {
+        return MillLocationTypeId;
+    }
+
+    public void setMillLocationTypeId(int millLocationTypeId) {
+        MillLocationTypeId = millLocationTypeId;
+    }
+
+    public int getSerialNumber() {
+        return SerialNumber;
+    }
+
+    public void setSerialNumber(int serialNumber) {
+        SerialNumber = serialNumber;
+    }
+
+    public int getFruitType() {
+        return FruitType;
+    }
+
+    public void setFruitType(int fruitType) {
+        FruitType = fruitType;
+    }
+
+    public String getVehicleNumber() {
+        return VehicleNumber;
+    }
+
+    public void setVehicleNumber(String vehicleNumber) {
+        VehicleNumber = vehicleNumber;
+    }
 
     public int getId() {
         return Id;
@@ -64,14 +100,6 @@ public class GatePass {
 
     public void setCreatedDate(String createdDate) {
         CreatedDate = createdDate;
-    }
-
-    public int getIsVehicleOut() {
-        return IsVehicleOut;
-    }
-
-    public void setIsVehicleOut(int isVehicleOut) {
-        IsVehicleOut = isVehicleOut;
     }
 
     public int getUpdatedByUserId() {

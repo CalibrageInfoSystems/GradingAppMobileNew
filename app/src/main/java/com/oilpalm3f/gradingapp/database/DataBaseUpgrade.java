@@ -72,15 +72,19 @@ public class DataBaseUpgrade {
 
         String column1 = "Alter Table FFBGrading Add VehicleNumber Varchar(50)";
 
+
+        String locationidcc = "ALTER TABLE CollectionCenter Add MillLocationTypeId INT";
         String fingerprintcolumn = "ALTER TABLE CollectionCenter Add IsFingerPrintReq BIT";
+
 
 
         String GatePassToken = "CREATE TABLE GatePassToken(    " +
                 " Id                                INTEGER     PRIMARY KEY AUTOINCREMENT ,\n" +
                 " GatePassTokenCode                         VARCHAR(100)             NOT NULL,\n" +
                 " VehicleNumber            VARCHAR(50)             NOT NULL,\n" +
-                " GatePassSerialNumber         INT               NOT NULL,\n" +
+                " GatePassSerialNumber          INT              NOT NULL,\n" +
                 " IsCollection    BOOLEAN       NOT NULL,\n" +
+                " MillLocationTypeId  INT,\n" +
                 " CreatedByUserId                     INT                 NOT NULL,\n" +
                 " CreatedDate                      DATETIME               NOT NULL,\n" +
                 "    ServerUpdatedStatus     BOOLEAN       NOT NULL\n" +
@@ -95,10 +99,14 @@ public class DataBaseUpgrade {
                 " CreatedByUserId                     INT                 NOT NULL,\n" +
                 " CreatedDate                      DATETIME               NOT NULL,\n" +
                 " UpdatedByUserId                    INT                  NOT NULL,\n" +
-                " IsVehicleOut    BOOLEAN       NOT NULL,\n" +
                 " UpdatedDate                      DATETIME               NOT NULL,\n" +
+                " MillLocationTypeId                     INT                 NOT NULL,\n" +
+                " SerialNumber                    INT               NOT NULL,\n" +
+                " FruitType                    BOOLEAN                  NOT NULL,\n" +
+                " VehicleNumber                     VARCHAR(50)                   NOT NULL,\n" +
                 "    ServerUpdatedStatus     BOOLEAN       NOT NULL\n" +
                 " );";
+
 
         String ActivityRight = "CREATE TABLE ActivityRight(    " +
                 " Id                                INTEGER    ,\n" +
@@ -154,9 +162,10 @@ public class DataBaseUpgrade {
                 " Code                         VARCHAR(25)             NOT NULL,\n" +
                 " Name            VARCHAR(100)             NOT NULL,\n" +
                 " IsActive    BOOLEAN       NOT NULL,\n" +
+                " MillLocationTypeId  INT ,\n" +
+                " IsAutomatic    BOOLEAN       NOT NULL,\n" +
                 " CreatedByUserId                     INT                 NOT NULL,\n" +
                 " CreatedDate                      DATETIME               NOT NULL,\n" +
-
                 " UpdatedByUserId                    INT                  NOT NULL,\n" +
                 " UpdatedDate                      DATETIME               NOT NULL\n" +
                 " );";
@@ -168,10 +177,49 @@ public class DataBaseUpgrade {
                 " MillWeighBridgeId                     INT                 NOT NULL\n" +
                 " );";
 
-        String column2 = "Alter Table FFBGrading Add GatePassCode Varchar(100)";
+       // String column2 = "Alter Table FFBGrading Add GatePassCode Varchar(100)";
+
+        String Role = "CREATE TABLE Role(    " +
+                " Id INTEGER PRIMARY KEY AUTOINCREMENT ,\n" +
+                " Code VARCHAR(50) NOT NULL,\n" +
+                " Name VARCHAR(255) NOT NULL,\n" +
+                " Desc VARCHAR(500) NULL,\n" +
+                " ParentRoleId INT NULL,\n" +
+                " IsActive BOOLEAN NOT NULL,\n" +
+                " CreatedByUserId INT NOT NULL,\n" +
+                " CreatedDate DATETIME NOT NULL,\n" +
+                " UpdatedByUserId INT NOT NULL,\n" +
+                " UpdatedDate DATETIME NOT NULL\n" +
+                " );";
+
+        String RoleActivityRightXref = "CREATE TABLE RoleActivityRightXrefs(    " +
+
+                " RoleId                     INT                         NOT NULL,\n" +
+                " ActivityRightId                     INT                 NOT NULL\n" +
+                " );";
+
+//        String LocationIdGP  = "Alter Table GatePass Add MillLocationTypeId  INT NOT NULL";
+//        String SerialNumber   = "Alter Table GatePass Add SerialNumber INT NOT NULL";
+//        String FruitType   = "Alter Table GatePass Add FruitType  BOOLEAN NOT NULL";
+//        String VehicleNumber   = "Alter Table GatePass Add VehicleNumber  Varchar(50) NOT NULL";
+
+        String GatePassOut  = "CREATE TABLE GatePassOut (    " +
+                " Id INTEGER PRIMARY KEY AUTOINCREMENT ,\n" +
+                " GatePassCode VARCHAR(50) NOT NULL,\n" +
+                " CreatedByUserId  INT NOT NULL, \n" +
+                " CreatedDate DATETIME NOT NULL, \n" +
+                " GatePassInTime DATETIME NOT NULL, \n" +
+                " ServerUpdatedStatus BOOLEAN NOT NULL\n" +
+                " );";
+
+        //String LocationIdGPS   = "Alter Table GatePassToken Add LocationId  INT NOT NULL";
+
+        String locationcc  = "Alter Table CollectionCenter Add LocationId  INT NOT NULL";
 
         try {
+
             db.execSQL(column1);
+            db.execSQL(locationidcc);
             db.execSQL(fingerprintcolumn);
             db.execSQL(GatePassToken);
             db.execSQL(GatePass);
@@ -181,7 +229,18 @@ public class DataBaseUpgrade {
             db.execSQL(LookUp);
             db.execSQL(MillWeighBridge);
             db.execSQL(UserMillWeighBridgexref);
-            db.execSQL(column2);
+           // db.execSQL(column2);
+
+            db.execSQL(Role);
+            db.execSQL(RoleActivityRightXref);
+            db.execSQL(GatePassOut);
+
+//            db.execSQL(LocationIdGP);
+//            db.execSQL(SerialNumber);
+//            db.execSQL(FruitType);
+//            db.execSQL(VehicleNumber);
+
+
 
         } catch (Exception e) {
             e.printStackTrace();

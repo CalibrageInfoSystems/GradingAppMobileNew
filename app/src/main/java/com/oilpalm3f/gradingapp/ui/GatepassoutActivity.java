@@ -43,8 +43,10 @@ public class GatepassoutActivity extends AppCompatActivity {
     String[] splitString;
     private DataAccessHandler dataAccessHandler;
     Button   submit;
-    TextView InTime,vehiclenumber,tokennumber;
+    TextView InTime,gatepasscodetv,tokennumber;
     int tokenexists;
+
+    String firsteight;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,7 +67,7 @@ public class GatepassoutActivity extends AppCompatActivity {
         }
         submit = findViewById(R.id.gatepassoutsubmit);
         InTime = findViewById(R.id.intime);
-        vehiclenumber = findViewById(R.id.vehiclenumber);
+        gatepasscodetv = findViewById(R.id.gatepasscodetv);
         tokennumber = findViewById(R.id.tokennumber);
 
     }
@@ -78,19 +80,42 @@ public class GatepassoutActivity extends AppCompatActivity {
 
         Log.d("qrvaluelengthint", String.valueOf(qrvaluelength));
 
-        if (qrvaluelength == 18){
+        if (qrvaluelength == 25){
 
-        final Gatepassoutdetails gatepassDetails = (Gatepassoutdetails) dataAccessHandler.getgatepassDetails(query, 0);
-     //   Log.e("=>gatepassDetails",gatepassDetails.getVehicleNumber() + "=="+ gatepassDetails.getCreatedDate());
+            firsteight = firstEight(qrvalue);
+            firsteight = firsteight.substring(0, 4) + "-" + firsteight.substring(4, firsteight.length());
+            firsteight = firsteight.substring(0, 7) + "-" + firsteight.substring(7, firsteight.length());
+            firsteight = firsteight.substring(0, 10) + " " + firsteight.substring(10, firsteight.length());
+            firsteight = firsteight.substring(0, 13) + ":" + firsteight.substring(13, firsteight.length());
+            firsteight = firsteight.substring(0, 16) + ":" + firsteight.substring(16, firsteight.length());
 
-        if (gatepassDetails != null) {
-            tokennumber.setText(gatepassDetails.getGatePassSerialNumber() + "");
-            vehiclenumber.setText(gatepassDetails.getVehicleNumber() + "");
-            InTime.setText(gatepassDetails.getCreatedDate() + "");
-        }else{
+            Log.d("FirstEightString",firsteight);
+            String lastFourDigits = qrvalue.substring(qrvalue.length() - 4);
+            Log.d("lastFourDigits",lastFourDigits);
 
-            showDialog(GatepassoutActivity.this, "GatePass code doesn't exist in your tab");
-        }
+            int token = Integer.parseInt(lastFourDigits);
+            Log.d("token", token + "");
+            String formattedToken = String.valueOf(token);
+            String tokenCount = "";
+            tokenCount = formattedToken;
+            Log.d("tokenCount", tokenCount + "");
+
+
+            tokennumber.setText(tokenCount + "");
+            gatepasscodetv.setText(qrvalue+ "");
+            InTime.setText(firsteight + "");
+
+//        final Gatepassoutdetails gatepassDetails = (Gatepassoutdetails) dataAccessHandler.getgatepassDetails(query, 0);
+//     //   Log.e("=>gatepassDetails",gatepassDetails.getVehicleNumber() + "=="+ gatepassDetails.getCreatedDate());
+//
+//        if (gatepassDetails != null) {
+//            tokennumber.setText(gatepassDetails.getGatePassSerialNumber() + "");
+//            vehiclenumber.setText(gatepassDetails.getVehicleNumber() + "");
+//            InTime.setText(gatepassDetails.getCreatedDate() + "");
+//        }else{
+//
+//            showDialog(GatepassoutActivity.this, "GatePass code doesn't exist in your tab");
+//        }
 
 
         tokenexists = dataAccessHandler.getOnlyOneIntValueFromDb(Queries.getInstance().getgateoutTokenExistQuery(qrvalue));
@@ -119,23 +144,84 @@ public class GatepassoutActivity extends AppCompatActivity {
 //        }
 
 
+//        submit.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//
+//                String whereCondition = " where GatePassCode = '"+ qrvalue +"'" ;
+//                List<LinkedHashMap> details = new ArrayList<>();
+//                LinkedHashMap map = new LinkedHashMap();
+//                map.put("UpdatedByUserId",Integer.parseInt(CommonConstants.USER_ID));
+//                map.put("UpdatedDate",CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
+//                map.put("IsVehicleOut",true);
+//                map.put("ServerUpdatedStatus",0);
+//                details.add(map);
+//                dataAccessHandler.updateData("GatePass", details, true, whereCondition, new ApplicationThread.OnComplete<String>() {
+//                    @Override
+//                    public void execute(boolean success, String result, String msg) {
+//                        if (success) {
+//                            if (CommonUtils.isNetworkAvailable(GatepassoutActivity.this)) {
+//                                DataSyncHelper.performRefreshTransactionsSync(GatepassoutActivity.this, new ApplicationThread.OnComplete() {
+//                                    @Override
+//                                    public void execute(boolean success, Object result, String msg) {
+//                                        if (success) {
+//                                            ApplicationThread.uiPost(LOG_TAG, "transactions sync message", new Runnable() {
+//                                                @Override
+//                                                public void run() {
+//                                                    CommonConstants.IsLogin = false;
+//                                                    UiUtils.showCustomToastMessage("Successfully data sent to server", GatepassoutActivity.this, 0);
+//                                                    startActivity(new Intent(GatepassoutActivity.this, MainActivity.class));
+//                                                }
+//                                            });
+//                                        } else {
+//                                            ApplicationThread.uiPost(LOG_TAG, "transactions sync failed message", new Runnable() {
+//                                                @Override
+//                                                public void run() {
+//                                                    UiUtils.showCustomToastMessage("Data sync failed", GatepassoutActivity.this, 1);
+//                                                }
+//                                            });
+//                                        }
+//                                    }
+//                                });
+//                            } else {
+//                                startActivity(new Intent(GatepassoutActivity.this, MainActivity.class));
+//                            }
+//
+//                        } else {
+//                            Toast.makeText(getApplicationContext(), "failed", Toast.LENGTH_LONG).show();
+//                        }
+//                    }
+//                });
+//
+//
+//
+//
+//            }
+//        });
+
         submit.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
 
-                String whereCondition = " where GatePassCode = '"+ qrvalue +"'" ;
                 List<LinkedHashMap> details = new ArrayList<>();
                 LinkedHashMap map = new LinkedHashMap();
-                map.put("UpdatedByUserId",Integer.parseInt(CommonConstants.USER_ID));
-                map.put("UpdatedDate",CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
-                map.put("IsVehicleOut",true);
-                map.put("ServerUpdatedStatus",0);
+
+                map.put("GatePassCode", qrvalue);
+                map.put("CreatedByUserId", CommonConstants.USER_ID);
+                map.put("CreatedDate", CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
+                map.put("GatePassInTime", firsteight);
+                map.put("ServerUpdatedStatus", false);
+
                 details.add(map);
-                dataAccessHandler.updateData("GatePass", details, true, whereCondition, new ApplicationThread.OnComplete<String>() {
+
+                dataAccessHandler.saveData("GatePassOut", details, new ApplicationThread.OnComplete<String>() {
                     @Override
                     public void execute(boolean success, String result, String msg) {
+
                         if (success) {
+                            Log.d(GradingActivity.class.getSimpleName(), "==>  Analysis ==> TABLE_GatePassToken INSERT COMPLETED");
                             if (CommonUtils.isNetworkAvailable(GatepassoutActivity.this)) {
                                 DataSyncHelper.performRefreshTransactionsSync(GatepassoutActivity.this, new ApplicationThread.OnComplete() {
                                     @Override
@@ -163,8 +249,9 @@ public class GatepassoutActivity extends AppCompatActivity {
                                 startActivity(new Intent(GatepassoutActivity.this, MainActivity.class));
                             }
 
+
                         } else {
-                            Toast.makeText(getApplicationContext(), "failed", Toast.LENGTH_LONG).show();
+                            Toast.makeText(GatepassoutActivity.this, "Submit Failed", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -174,6 +261,11 @@ public class GatepassoutActivity extends AppCompatActivity {
 
             }
         });
+
+    }
+
+    public String firstEight(String str) {
+        return str.length() < 14 ? str : str.substring(0, 14);
     }
 
     public void showDialog(Activity activity, String msg) {

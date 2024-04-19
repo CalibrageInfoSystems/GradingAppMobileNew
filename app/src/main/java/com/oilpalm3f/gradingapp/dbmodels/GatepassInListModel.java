@@ -5,21 +5,64 @@ public class GatepassInListModel {
 
     private String GatePassCode;
     private String GatePassTokenCode;
-    private String IsVehicleOut;
     private String CreatedDate;
     private String WBCode;
     private String VehicleType;
     private String WBID;
     private String VehicleCategory;
-
-    private String IsCollection;
-
     private String VehicleNumber;
 
     private String VehicleTypeId;
 
     private String VehicleCategoryId;
 
+
+    private int MillLocationTypeId;
+    private String MillLocation;
+    private String SerialNumber;
+    private String FruitType;
+
+    private String CreatedBy;
+
+    public String getCreatedBy() {
+        return CreatedBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        CreatedBy = createdBy;
+    }
+
+    public int getMillLocationTypeId() {
+        return MillLocationTypeId;
+    }
+
+    public void setMillLocationTypeId(int millLocationTypeId) {
+        MillLocationTypeId = millLocationTypeId;
+    }
+
+    public String getMillLocation() {
+        return MillLocation;
+    }
+
+    public void setMillLocation(String millLocation) {
+        MillLocation = millLocation;
+    }
+
+    public String getSerialNumber() {
+        return SerialNumber;
+    }
+
+    public void setSerialNumber(String serialNumber) {
+        SerialNumber = serialNumber;
+    }
+
+    public String getFruitType() {
+        return FruitType;
+    }
+
+    public void setFruitType(String fruitType) {
+        FruitType = fruitType;
+    }
 
     public String getVehicleTypeId() {
         return VehicleTypeId;
@@ -45,14 +88,6 @@ public class GatepassInListModel {
         VehicleNumber = vehicleNumber;
     }
 
-    public String getIsCollection() {
-        return IsCollection;
-    }
-
-    public void setIsCollection(String isCollection) {
-        IsCollection = isCollection;
-    }
-
     public String getGatePassCode() {
         return GatePassCode;
     }
@@ -68,15 +103,6 @@ public class GatepassInListModel {
     public void setGatePassTokenCode(String gatePassTokenCode) {
         GatePassTokenCode = gatePassTokenCode;
     }
-
-    public String getIsVehicleOut() {
-        return IsVehicleOut;
-    }
-
-    public void setIsVehicleOut(String isVehicleOut) {
-        IsVehicleOut = isVehicleOut;
-    }
-
     public String getCreatedDate() {
         return CreatedDate;
     }

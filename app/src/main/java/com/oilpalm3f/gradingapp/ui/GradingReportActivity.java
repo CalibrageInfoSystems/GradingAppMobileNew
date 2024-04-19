@@ -8,11 +8,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +29,7 @@ import com.oilpalm3f.gradingapp.common.CommonConstants;
 import com.oilpalm3f.gradingapp.common.CommonUtils;
 import com.oilpalm3f.gradingapp.database.DataAccessHandler;
 import com.oilpalm3f.gradingapp.database.Queries;
+import com.oilpalm3f.gradingapp.dbmodels.GatepassTokenListModel;
 import com.oilpalm3f.gradingapp.dbmodels.GradingReportModel;
 import com.oilpalm3f.gradingapp.printer.BluetoothDevicesFragment;
 import com.oilpalm3f.gradingapp.printer.PrinterChooserFragment;
@@ -38,6 +42,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -59,6 +64,20 @@ public class GradingReportActivity extends AppCompatActivity implements onPrintO
     private BluetoothDevicesFragment bluetoothDevicesFragment = null;
     private UsbDevicesListFragment usbDevicesListFragment = null;
 
+    private EditText searchtext;
+    private ImageView clearsearch;
+    private android.widget.ProgressBar searchprogress;
+    private boolean isSearch = false;
+
+    String searchKey = "";
+
+    private LinearLayoutManager layoutManager;
+
+
+
+    public static final int LIMIT = 30;
+    private int offset;
+    private boolean hasMoreItems = true;
 
 
     //Oncreate with SetAdapter
@@ -73,22 +92,23 @@ public class GradingReportActivity extends AppCompatActivity implements onPrintO
 
         dataAccessHandler = new DataAccessHandler(this);
         initUI();
+        setViews();
 
         String currentDate = CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY);
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
         fromDateEdt.setText(sdf.format(new Date()));
         toDateEdt.setText(sdf.format(new Date()));
 //
-       searchQuery = Queries.getInstance().getGradingReports(currentDate, currentDate);
-//        SearchCollectionwithoutPlotQuery = Queries.getInstance().getCollectionCenterReportsWithOutPlot(currentDate, currentDate);
-        updateLabel(0);
-        updateLabel(1);
-        getGradingReports(searchQuery);
+//       searchQuery = Queries.getInstance().getGradingReports(currentDate, currentDate);
+////        SearchCollectionwithoutPlotQuery = Queries.getInstance().getCollectionCenterReportsWithOutPlot(currentDate, currentDate);
+//        updateLabel(0);
+//        updateLabel(1);
+//        getGradingReports(searchQuery);
         CommonUtils.currentActivity = this;
-        gradingReportRecyclerAdapter = new GradingReportAdapter(GradingReportActivity.this);
-        gradingReportRecyclerAdapter.setonPrintSelected((this));
-        gradingReportsList.setLayoutManager(new LinearLayoutManager(GradingReportActivity.this, LinearLayoutManager.VERTICAL, false));
-        gradingReportsList.setAdapter(gradingReportRecyclerAdapter);
+        gradingReportRecyclerAdapter = new GradingReportAdapter(GradingReportActivity.this, mReportsList);
+
+//        gradingReportsList.setLayoutManager(new LinearLayoutManager(GradingReportActivity.this, LinearLayoutManager.VERTICAL, false));
+//        gradingReportsList.setAdapter(gradingReportRecyclerAdapter);
 
 //        String CollectionNetWeight = dataAccessHandler.getOnlyOneValueFromDb(Queries.getInstance().getCollectionNetSum(currentDate, currentDate));
 //        String CollectionWithOutPlotNetWeight = dataAccessHandler.getOnlyOneValueFromDb(Queries.getInstance().getCollectionWithOutPlotNetSum(currentDate, currentDate));
@@ -103,108 +123,43 @@ public class GradingReportActivity extends AppCompatActivity implements onPrintO
 //        totalNetWeightSum.setText(" "+totalNetWeight + " Kgs");
     }
 
-    //To Get Gradnig Reports
-    public void getGradingReports(final String searchQuery) {
-        ProgressBar.showProgressBar(this, "Please wait...");
-        ApplicationThread.bgndPost(LOG_TAG, "getting reports data", new Runnable() {
+    private void setViews() {
+        offset = offset + LIMIT;
+        searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
-                dataAccessHandler.getGradingReportDetails(searchQuery, new ApplicationThread.OnComplete<List<GradingReportModel>>() {
+            public void onClick(View v) {
+                ProgressBar.showProgressBar(GradingReportActivity.this, "Please wait...");
+                mReportsList = (List<GradingReportModel>) dataAccessHandler.getGradingList(Queries.getInstance().getGradingReports(LIMIT, offset,fromDateStr,toDateStr, searchKey), 1);
+                Collections.reverse(mReportsList);
+                ApplicationThread.bgndPost(LOG_TAG, "getting reports data", new Runnable() {
                     @Override
-                    public void execute(boolean success, final List<GradingReportModel> reports, String msg) {
-                        ProgressBar.hideProgressBar();
-                        if (success) {
-                            if (reports != null && reports.size() > 0) {
-                                mReportsList.clear();
-                                mReportsList = reports;
-                                ApplicationThread.uiPost(LOG_TAG, "update ui", new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        int recordsSize = reports.size();
-                                        Log.v(LOG_TAG, "data size " + recordsSize);
-                                        if (recordsSize > 0) {
-                                            gradingReportRecyclerAdapter.updateAdapter(reports);
-                                            tvNorecords.setVisibility(View.GONE);
-                                            gradingReportsList.setVisibility(View.VISIBLE);
-                                          //  setTile(getString(R.string.collection_report) + " ("+recordsSize+")");
-                                        } else {
-                                            tvNorecords.setVisibility(View.VISIBLE);
-                                        }
-                                    }
-                                });
-                            } else {
-                                ApplicationThread.uiPost(LOG_TAG, "updating ui", new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        tvNorecords.setVisibility(View.VISIBLE);
-                                        Log.v(LOG_TAG, "@@@ No records found");
-                                        gradingReportsList.setVisibility(View.GONE);
-                                    }
-                                });
-                            }
-                        } else {
-                            ApplicationThread.uiPost(LOG_TAG, "updating ui", new Runnable() {
-                                @Override
-                                public void run() {
-                                    tvNorecords.setVisibility(View.VISIBLE);
-                                    Log.v(LOG_TAG, "@@@ No records found");
-                                    gradingReportsList.setVisibility(View.GONE);
+                    public void run() {
+
+                        ApplicationThread.uiPost(LOG_TAG, "", new Runnable() {
+                            @Override
+                            public void run() {
+                                ProgressBar.hideProgressBar();
+                                gradingReportRecyclerAdapter = new GradingReportAdapter(GradingReportActivity.this, mReportsList);
+                                if (mReportsList != null && !mReportsList.isEmpty() && mReportsList.size()!= 0) {
+                                    gradingReportsList.setVisibility(View.VISIBLE);
+                                    tvNorecords.setVisibility(View.GONE);
+                                    layoutManager = new LinearLayoutManager(GradingReportActivity.this, LinearLayoutManager.VERTICAL, false);
+                                    gradingReportsList.setLayoutManager(layoutManager);
+
+                                    gradingReportsList.setAdapter(gradingReportRecyclerAdapter);
+                                    gradingReportRecyclerAdapter.setonPrintSelected((GradingReportActivity.this));
+                                    //   setTitle(alert_type, offset == 0 ? alertsVisitsInfoList.size() : offset);
                                 }
-                            });
-                        }
+                                else{
+                                    gradingReportsList.setVisibility(View.GONE);
+                                    tvNorecords.setVisibility(View.VISIBLE);
+                                }
+                            }
+                        });
                     }
                 });
             }
         });
-    }
-
-//Intialize the UI & search funtionality
-    private void initUI() {
-        gradingReportsList = (RecyclerView) findViewById(R.id.grading_reports_list);
-        searchBtn = (Button) findViewById(R.id.searchBtn);
-        totalNetWeightSum = (TextView) findViewById(R.id.totalNetWeightSum);
-
-        searchBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (TextUtils.isEmpty(fromDateStr) && TextUtils.isEmpty(toDateStr)) {
-                    UiUtils.showCustomToastMessage("Please select from or to dates", GradingReportActivity.this, 0);
-                } else if (isDateAfter(fromDateStr, toDateStr)){
-//                    String CollectionNetWeight = dataAccessHandler.getOnlyOneValueFromDb(Queries.getInstance().getCollectionNetSum(fromDateStr, toDateStr));
-//                    String CollectionWithOutPlotNetWeight = dataAccessHandler.getOnlyOneValueFromDb(Queries.getInstance().getCollectionWithOutPlotNetSum(fromDateStr, toDateStr));
-//                    if (CollectionNetWeight == null){
-//                        CollectionNetWeight = "0.0";
-//                    }
-//                    if (CollectionWithOutPlotNetWeight == null){
-//                        CollectionWithOutPlotNetWeight = "0.0";
-//                    }
-//                    Float totalNetWeight = Float.valueOf(CollectionNetWeight) + Float.valueOf(CollectionWithOutPlotNetWeight);
-////                    String totalNetWeight = dataAccessHandler.getOnlyOneValueFromDb(Queries.getInstance().getCollectionNetSum(fromDateStr, toDateStr));
-//                    if (!TextUtils.isEmpty(String.valueOf(totalNetWeight))) {
-//                        totalNetWeightSum.setText(" "+totalNetWeight + " Kgs");
-//                    }
-                    searchQuery = Queries.getInstance().getGradingReports(fromDateStr, toDateStr);
-//                    SearchCollectionwithoutPlotQuery = Queries.getInstance().getCollectionCenterReportsWithOutPlot(fromDateStr, toDateStr);
-                    if (null != gradingReportRecyclerAdapter) {
-                        mReportsList.clear();
-                        gradingReportRecyclerAdapter.notifyDataSetChanged();
-                    }
-                    getGradingReports(searchQuery);
-                }else{
-                    UiUtils.showCustomToastMessage("From date must be less than To date", GradingReportActivity.this, 1);
-                    mReportsList.clear();
-                    gradingReportRecyclerAdapter.notifyDataSetChanged();
-
-                }
-            }
-        });
-        tvNorecords = (TextView) findViewById(R.id.no_records);
-        tvNorecords.setVisibility(View.GONE);
-
-        fromDateEdt = (EditText) findViewById(R.id.fromDate);
-        toDateEdt = (EditText) findViewById(R.id.toDate);
-
-        //From and To Date on Click listeners with DatePicker Dialogs
 
         final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -230,6 +185,11 @@ public class GradingReportActivity extends AppCompatActivity implements onPrintO
             }
         };
 
+        String dateFormatter = "yyyy-MM-dd";
+        SimpleDateFormat sdf2 = new SimpleDateFormat(dateFormatter, Locale.US);
+        fromDateStr = sdf2.format(myCalendar.getTime());
+        toDateStr = sdf2.format(myCalendar.getTime());
+
         toDateEdt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -249,6 +209,218 @@ public class GradingReportActivity extends AppCompatActivity implements onPrintO
                 datePickerDialog.show();
             }
         });
+
+        clearsearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isSearch = false;
+                mReportsList.clear();
+                searchtext.setText("");
+            }
+        });
+
+        searchtext.addTextChangedListener(mTextWatcher);
+
+        gradingsearchreportslist(offset);
+
+    }
+
+    private TextWatcher mTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            Log.d("WhatisinSearch", "is :"+ s);
+            //
+            offset = 0;
+            ApplicationThread.uiPost(LOG_TAG, "search", new Runnable() {
+                @Override
+                public void run() {
+                    doSearch(s.toString().trim());
+                    if (s.toString().length() > 0) {
+                        clearsearch.setVisibility(View.VISIBLE);
+                    } else {
+                        clearsearch.setVisibility(View.GONE);
+                    }
+                }
+            }, 100);
+        }
+
+        @Override
+        public void afterTextChanged(final Editable s) {
+
+        }
+    };
+
+    public void doSearch(String searchQuery) {
+        Log.d("DoSearchQuery", "is :" +  searchQuery);
+        offset = 0;
+        hasMoreItems = true;
+        if (searchQuery !=null &  !TextUtils.isEmpty(searchQuery)  & searchQuery.length()  > 0) {
+
+            offset = 0;
+            isSearch = true;
+            searchKey = searchQuery.trim();
+            gradingsearchreportslist(offset);
+        } else {
+            searchKey = "";
+            isSearch = false;
+            gradingsearchreportslist(offset);
+        }
+    }
+
+    //To Get Gradnig Reports
+//    public void getGradingReports(final String searchQuery) {
+//        ProgressBar.showProgressBar(this, "Please wait...");
+//        ApplicationThread.bgndPost(LOG_TAG, "getting reports data", new Runnable() {
+//            @Override
+//            public void run() {
+//                dataAccessHandler.getGradingReportDetails(searchQuery, new ApplicationThread.OnComplete<List<GradingReportModel>>() {
+//                    @Override
+//                    public void execute(boolean success, final List<GradingReportModel> reports, String msg) {
+//                        ProgressBar.hideProgressBar();
+//                        if (success) {
+//                            if (reports != null && reports.size() > 0) {
+//                                mReportsList.clear();
+//                                mReportsList = reports;
+//                                ApplicationThread.uiPost(LOG_TAG, "update ui", new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        int recordsSize = reports.size();
+//                                        Log.v(LOG_TAG, "data size " + recordsSize);
+//                                        if (recordsSize > 0) {
+//                                            gradingReportRecyclerAdapter.updateAdapter(reports);
+//                                            tvNorecords.setVisibility(View.GONE);
+//                                            gradingReportsList.setVisibility(View.VISIBLE);
+//                                          //  setTile(getString(R.string.collection_report) + " ("+recordsSize+")");
+//                                        } else {
+//                                            tvNorecords.setVisibility(View.VISIBLE);
+//                                        }
+//                                    }
+//                                });
+//                            } else {
+//                                ApplicationThread.uiPost(LOG_TAG, "updating ui", new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        tvNorecords.setVisibility(View.VISIBLE);
+//                                        Log.v(LOG_TAG, "@@@ No records found");
+//                                        gradingReportsList.setVisibility(View.GONE);
+//                                    }
+//                                });
+//                            }
+//                        } else {
+//                            ApplicationThread.uiPost(LOG_TAG, "updating ui", new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    tvNorecords.setVisibility(View.VISIBLE);
+//                                    Log.v(LOG_TAG, "@@@ No records found");
+//                                    gradingReportsList.setVisibility(View.GONE);
+//                                }
+//                            });
+//                        }
+//                    }
+//                });
+//            }
+//        });
+//    }
+
+//Intialize the UI & search funtionality
+    private void initUI() {
+        gradingReportsList = (RecyclerView) findViewById(R.id.grading_reports_list);
+        searchBtn = (Button) findViewById(R.id.searchBtn);
+        totalNetWeightSum = (TextView) findViewById(R.id.totalNetWeightSum);
+
+        searchtext = (EditText) findViewById(R.id.searchtext);
+        clearsearch = (ImageView) findViewById(R.id.clearsearch);
+        searchprogress = (android.widget.ProgressBar) findViewById(R.id.searchprogress);
+
+//        searchBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (TextUtils.isEmpty(fromDateStr) && TextUtils.isEmpty(toDateStr)) {
+//                    UiUtils.showCustomToastMessage("Please select from or to dates", GradingReportActivity.this, 0);
+//                } else if (isDateAfter(fromDateStr, toDateStr)){
+////                    String CollectionNetWeight = dataAccessHandler.getOnlyOneValueFromDb(Queries.getInstance().getCollectionNetSum(fromDateStr, toDateStr));
+////                    String CollectionWithOutPlotNetWeight = dataAccessHandler.getOnlyOneValueFromDb(Queries.getInstance().getCollectionWithOutPlotNetSum(fromDateStr, toDateStr));
+////                    if (CollectionNetWeight == null){
+////                        CollectionNetWeight = "0.0";
+////                    }
+////                    if (CollectionWithOutPlotNetWeight == null){
+////                        CollectionWithOutPlotNetWeight = "0.0";
+////                    }
+////                    Float totalNetWeight = Float.valueOf(CollectionNetWeight) + Float.valueOf(CollectionWithOutPlotNetWeight);
+//////                    String totalNetWeight = dataAccessHandler.getOnlyOneValueFromDb(Queries.getInstance().getCollectionNetSum(fromDateStr, toDateStr));
+////                    if (!TextUtils.isEmpty(String.valueOf(totalNetWeight))) {
+////                        totalNetWeightSum.setText(" "+totalNetWeight + " Kgs");
+////                    }
+//                    searchQuery = Queries.getInstance().getGradingReports(fromDateStr, toDateStr);
+////                    SearchCollectionwithoutPlotQuery = Queries.getInstance().getCollectionCenterReportsWithOutPlot(fromDateStr, toDateStr);
+//                    if (null != gradingReportRecyclerAdapter) {
+//                        mReportsList.clear();
+//                        gradingReportRecyclerAdapter.notifyDataSetChanged();
+//                    }
+//                    getGradingReports(searchQuery);
+//                }else{
+//                    UiUtils.showCustomToastMessage("From date must be less than To date", GradingReportActivity.this, 1);
+//                    mReportsList.clear();
+//                    gradingReportRecyclerAdapter.notifyDataSetChanged();
+//
+//                }
+//            }
+//        });
+        tvNorecords = (TextView) findViewById(R.id.no_records);
+        tvNorecords.setVisibility(View.GONE);
+
+        fromDateEdt = (EditText) findViewById(R.id.fromDate);
+        toDateEdt = (EditText) findViewById(R.id.toDate);
+
+        //From and To Date on Click listeners with DatePicker Dialogs
+
+//        final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+//            @Override
+//            public void onDateSet(DatePicker view, int year, int monthOfYear,
+//                                  int dayOfMonth) {
+//                myCalendar.set(Calendar.YEAR, year);
+//                myCalendar.set(Calendar.MONTH, monthOfYear);
+//                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+//                updateLabel(0);
+//            }
+//        };
+//
+//
+//
+//        final DatePickerDialog.OnDateSetListener toDate = new DatePickerDialog.OnDateSetListener() {
+//            @Override
+//            public void onDateSet(DatePicker view, int year, int monthOfYear,
+//                                  int dayOfMonth) {
+//                myCalendar.set(Calendar.YEAR, year);
+//                myCalendar.set(Calendar.MONTH, monthOfYear);
+//                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+//                updateLabel(1);
+//            }
+//        };
+//
+//        toDateEdt.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                DatePickerDialog datePickerDialog = new DatePickerDialog(GradingReportActivity.this, toDate, myCalendar
+//                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+//                        myCalendar.get(Calendar.DAY_OF_MONTH));  //date is dateSetListener as per your code in question
+//                datePickerDialog.show();
+//            }
+//        });
+//
+//        fromDateEdt.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                DatePickerDialog datePickerDialog = new DatePickerDialog(GradingReportActivity.this, date, myCalendar
+//                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+//                        myCalendar.get(Calendar.DAY_OF_MONTH));  //date is dateSetListener as per your code in question
+//                datePickerDialog.show();
+//            }
+//        });
     }
 
     //Update the from and to date labels
@@ -406,7 +578,7 @@ public class GradingReportActivity extends AppCompatActivity implements onPrintO
         mPrinter.setCharacterMultiple(0, 1);
         mPrinter.printText(" 3F OILPALM PVT LTD " + "\n");
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_CENTER);
-        mPrinter.setCharacterMultiple(0, 1);
+        mPrinter.setCharacterMultiple(0, 0);
         mPrinter.printText(" FFB Grading Receipt" + "\n");
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_LEFT);
         mPrinter.setCharacterMultiple(0, 0);
@@ -525,7 +697,6 @@ public class GradingReportActivity extends AppCompatActivity implements onPrintO
         android.util.Log.d("tokenCount", tokenCount);
         String formattedToken = String.valueOf(tokennum);
         android.util.Log.d("formattedToken", formattedToken);
-
         String finaltoken = formattedToken;
         Log.d("tokenCount", tokenCount + "");
 
@@ -561,7 +732,7 @@ public class GradingReportActivity extends AppCompatActivity implements onPrintO
             rejectedbunches = selectedReport.getRejectedBunches();
         }
 
-        String hashString = selectedReport.getTokenNumber()+"/"+selectedReport.getCCCode()+"/"+fruitTypeNumber+"/"+selectedReport.getGrossWeight()+"/"+selectedReport.getVehicleNumber()+"/"+selectedReport.getGatePassCode()+"/"+selectedReport.getCreatedDatewithtime()+"/"+
+        String hashString = selectedReport.getTokenNumber()+"/"+selectedReport.getCCCode()+"/"+fruitTypeNumber+"/"+selectedReport.getGrossWeight()+"/"+selectedReport.getVehicleNumber()+"/"+selectedReport.getCreatedDatewithtime()+"/"+
                 selectedReport.getUnRipen()+"/"+selectedReport.getUnderRipe()
                 +"/"+selectedReport.getRipen()+"/"+selectedReport.getOverRipe()+"/"+selectedReport.getDiseased()+"/"+selectedReport.getEmptyBunches()+"/"
                 +selectedReport.getFFBQualityLong()+"/"+selectedReport.getFFBQualityMedium()+"/"+selectedReport.getFFBQualityShort()+"/"+
@@ -581,33 +752,36 @@ public class GradingReportActivity extends AppCompatActivity implements onPrintO
 
         mPrinter.printText(space);
         mPrinter.printText(spaceBuilderr);
-        mPrinter.printText(tokenNumber);
-        mPrinter.printText(spaceBuilderr);
-        mPrinter.printText(finaltoken);
+        mPrinter.printText(tokenNumber + " - " + finaltoken);
         mPrinter.printText(spaceBuilderr);
         mPrinter.printText(space);
         mPrinter.printText(spaceBuilderr);
 
-        if(CommonConstants.PrinterName.contains("AMIGOS")){
+//        if(CommonConstants.PrinterName.contains("AMIGOS")){
+//            android.util.Log.d(LOG_TAG,"########### NEW ##############");
+//            print_qr_code(mPrinter,qrCodeValue);
+//        }else{
+//            android.util.Log.d(LOG_TAG,"########### OLD ##############");
+//            mPrinter.printBarCode(barcode);
+//        }
+
+        if(CommonConstants.PrinterName.contains("G-8BT3 AMIGOS")){
             android.util.Log.d(LOG_TAG,"########### NEW ##############");
+            //mPrinter.setPrintModel(false,true,true,false);
+            print_qr_codee(mPrinter,qrCodeValue);
+        }else if (CommonConstants.PrinterName.contains("AMIGOS")){
             print_qr_code(mPrinter,qrCodeValue);
         }else{
             android.util.Log.d(LOG_TAG,"########### OLD ##############");
             mPrinter.printBarCode(barcode);
         }
+
         mPrinter.setPrinter(PrinterConstants.Command.ALIGN, PrinterConstants.Command.ALIGN_CENTER);
         mPrinter.setCharacterMultiple(0, 1);
        // mPrinter.printText(qrCodeValue);
 
         String spaceBuilder = "\n" +
-                " " +
-                "\n" +
-                " " +
-                "\n" +
-                "\n" +
-                " " +
-                "\n" +
-                "\n";
+                " " ;
         mPrinter.printText(spaceBuilder);
 
         boolean printSuccess = false;
@@ -681,5 +855,99 @@ public class GradingReportActivity extends AppCompatActivity implements onPrintO
         mPrinter.sendByteData(qrdata.getBytes());
         mPrinter.sendByteData(printQR);
 
+    }
+
+    public void print_qr_codee(PrinterInstance mPrinter,String qrdata)
+    {
+        int store_len = qrdata.length() + 3;
+        byte store_pL = (byte) (store_len % 256);
+        byte store_pH = (byte) (store_len / 256);
+
+
+        // QR Code: Select the modelc
+        //              Hex     1D      28      6B      04      00      31      41      n1(x32)     n2(x00) - size of model
+        // set n1 [49 x31, model 1] [50 x32, model 2] [51 x33, micro qr code]
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=140
+        byte[] modelQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x04, (byte)0x00, (byte)0x31, (byte)0x41, (byte)0x32, (byte)0x00};
+
+        // QR Code: Set the size of module
+        // Hex      1D      28      6B      03      00      31      43      n
+        // n depends on the printer
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=141
+
+
+        byte[] sizeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x43, (byte)0x1};
+
+
+        //          Hex     1D      28      6B      03      00      31      45      n
+        // Set n for error correction [48 x30 -> 7%] [49 x31-> 15%] [50 x32 -> 25%] [51 x33 -> 30%]
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=142
+        byte[] errorQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x45, (byte)0x31};
+
+
+        // QR Code: Store the data in the symbol storage area
+        // Hex      1D      28      6B      pL      pH      31      50      30      d1...dk
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=143
+        //                        1D          28          6B         pL          pH  cn(49->x31) fn(80->x50) m(48->x30) d1…dk
+        byte[] storeQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, store_pL, store_pH, (byte)0x31, (byte)0x50, (byte)0x30};
+
+
+        // QR Code: Print the symbol data in the symbol storage area
+        // Hex      1D      28      6B      03      00      31      51      m
+        // https://reference.epson-biz.com/modules/ref_escpos/index.php?content_id=144
+        byte[] printQR = {(byte)0x1d, (byte)0x28, (byte)0x6b, (byte)0x03, (byte)0x00, (byte)0x31, (byte)0x51, (byte)0x30};
+
+        // flush() runs the print job and clears out the print buffer
+//        flush();
+
+        // write() simply appends the data to the buffer
+        mPrinter.sendByteData(modelQR);
+
+        mPrinter.sendByteData(sizeQR);
+        mPrinter.sendByteData(errorQR);
+        mPrinter.sendByteData(storeQR);
+        mPrinter.sendByteData(qrdata.getBytes());
+        mPrinter.sendByteData(printQR);
+
+    }
+
+    private void gradingsearchreportslist(final int offset) {
+        //ProgressBar.showProgressBar(this, "Please wait...");
+
+        if (searchprogress != null) {
+            searchprogress.setVisibility(View.VISIBLE);
+        }
+        ApplicationThread.bgndPost(LOG_TAG, "notvisitedplots", new Runnable() {
+            @Override
+            public void run() {
+
+                mReportsList = (List<GradingReportModel>) dataAccessHandler.getGradingList(Queries.getInstance().getGradingReports(LIMIT, offset,fromDateStr,toDateStr, searchKey), 1);
+                Collections.reverse(mReportsList);
+
+                ApplicationThread.uiPost(LOG_TAG, "", new Runnable() {
+                    @Override
+                    public void run() {
+                        //ProgressBar.hideProgressBar();
+                        searchprogress.setVisibility(View.GONE);
+                        gradingReportRecyclerAdapter = new GradingReportAdapter(GradingReportActivity.this, mReportsList);
+                        if (mReportsList != null && !mReportsList.isEmpty()) {
+                            gradingReportsList.setVisibility(View.VISIBLE);
+                            tvNorecords.setVisibility(View.GONE);
+                            layoutManager = new LinearLayoutManager(GradingReportActivity.this, LinearLayoutManager.VERTICAL, false);
+                            gradingReportsList.setLayoutManager(layoutManager);
+
+                            gradingReportsList.setAdapter(gradingReportRecyclerAdapter);
+                            gradingReportRecyclerAdapter.setonPrintSelected((GradingReportActivity.this));
+                            //   setTitle(alert_type, offset == 0 ? alertsVisitsInfoList.size() : offset);
+                        }
+                        else{
+                            gradingReportsList.setVisibility(View.GONE);
+                            tvNorecords.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+
+            }
+        });
     }
 }

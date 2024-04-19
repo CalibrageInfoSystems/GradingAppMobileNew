@@ -36,16 +36,16 @@ public class GatepassinlistAdapter extends RecyclerView.Adapter<GatepassinlistAd
     private Context context;
     private GatepassInListModel item;
     private DataAccessHandler dataAccessHandler = null;
-    private ongatepassinprintselected onPrintSelected;
+    private ongatepassinprintselected ongatepassinPrintSelected;
 
     SimpleDateFormat input = new SimpleDateFormat("yyyy-MM-dd");
     SimpleDateFormat output = new SimpleDateFormat("dd-MM-yyyy");
     int row_index = -1;
     LayoutInflater mInflater;
 
-    public GatepassinlistAdapter(Context context) {
+    public GatepassinlistAdapter(Context context, List<GatepassInListModel> mList) {
         this.context = context;
-        mList = new ArrayList<>();
+        this.mList = mList;
         dataAccessHandler = new DataAccessHandler(context);
     }
 
@@ -66,22 +66,24 @@ public class GatepassinlistAdapter extends RecyclerView.Adapter<GatepassinlistAd
         Log.d("Size", mList.size() + "");
 
         Log.d("getGatepasscode", mList.get(position).getGatePassCode() + "");
+        Log.d("getFruitType", mList.get(position).getFruitType() + "");
 
         holder.tvgatepasstokencode.setText(mList.get(position).getGatePassCode() + "");
         holder.tvgatepasstokennumber.setText(mList.get(position).getGatePassTokenCode() + "");
-        holder.tvisvehicleout.setText(mList.get(position).getIsVehicleOut() + "");
         holder.tvgatepassindate.setText(mList.get(position).getCreatedDate() + "");
         holder.tvwbcode.setText(mList.get(position).getWBCode() + "");
         holder.tvvehicletype.setText(mList.get(position).getVehicleType() + "");
+        holder.tvmilllocation.setText(mList.get(position).getMillLocation() + "");
+        holder.tvvehiclenumber.setText(mList.get(position).getVehicleNumber() + "");
 
-        String datetime = mList.get(position).getGatePassCode().substring(0, 14);
-        String serialNumber = mList.get(position).getGatePassCode().substring(14, 18);
+//        String datetime = mList.get(position).getGatePassCode().substring(0, 14);
+//        String serialNumber = mList.get(position).getGatePassCode().substring(14, 18);
+//
+//        Log.d("datetime", datetime + "");
+//        Log.d("serialNumber", serialNumber + "");
 
-        Log.d("datetime", datetime + "");
-        Log.d("serialNumber", serialNumber + "");
 
-
-        String qrCodeValue = datetime +"/" +serialNumber+"/" +mList.get(position).getIsCollection()+"/" + mList.get(position).getVehicleNumber()
+        String qrCodeValue = mList.get(position).getGatePassCode() +"/" +mList.get(position).getSerialNumber() +"/" +mList.get(position).getFruitType()+"/" + mList.get(position).getVehicleNumber()
         + "/" +mList.get(position).getVehicleCategoryId()+"/" +mList.get(position).getVehicleTypeId()+"/" + mList.get(position).getWBID();
 
         holder.tvgatepasstokencode.setOnClickListener(new View.OnClickListener() {
@@ -98,11 +100,11 @@ public class GatepassinlistAdapter extends RecyclerView.Adapter<GatepassinlistAd
 
                 Log.d("Method1", "into this");
 
-                if (null != onPrintSelected) {
+                if (null != ongatepassinPrintSelected) {
 
                     Log.d("Method2", "into this");
 
-                    onPrintSelected.gatepassinprinOptionSelected(position);
+                    ongatepassinPrintSelected.gatepassinprinOptionSelected(position);
                 }
             }
         });
@@ -119,14 +121,14 @@ public class GatepassinlistAdapter extends RecyclerView.Adapter<GatepassinlistAd
         notifyDataSetChanged();
     }
 
-    public void setonPrintSelected(final ongatepassinprintselected onPrintSelected) {
-        this.onPrintSelected = onPrintSelected;
+    public void setonGatepassinPrintSelected(final ongatepassinprintselected ongatepassinPrintSelected) {
+        this.ongatepassinPrintSelected = ongatepassinPrintSelected;
     }
 
     public class GatepassinReportViewHolder extends RecyclerView.ViewHolder {
 
 
-        private TextView tvgatepasstokencode, tvgatepasstokennumber, tvisvehicleout, tvgatepassindate, tvwbcode, tvvehicletype;
+        private TextView tvgatepasstokencode, tvgatepasstokennumber, tvisvehicleout, tvgatepassindate, tvwbcode, tvvehicletype, tvmilllocation, tvvehiclenumber;
         private ImageView printBtn;
 
         public GatepassinReportViewHolder(@NonNull View itemView) {
@@ -134,10 +136,12 @@ public class GatepassinlistAdapter extends RecyclerView.Adapter<GatepassinlistAd
 
             tvgatepasstokencode = (TextView) itemView.findViewById(R.id.tvgatepasstokencode);
             tvgatepasstokennumber = (TextView) itemView.findViewById(R.id.tvgatepasstokennumber);
-            tvisvehicleout = (TextView) itemView.findViewById(R.id.tvisvehicleout);
             tvgatepassindate = (TextView) itemView.findViewById(R.id.tvgatepassindate);
             tvwbcode = (TextView) itemView.findViewById(R.id.tvwbcode);
             tvvehicletype = (TextView) itemView.findViewById(R.id.tvvehicletype);
+            tvmilllocation = (TextView) itemView.findViewById(R.id.tvmilllocation);
+            tvvehiclenumber = (TextView) itemView.findViewById(R.id.tvvehiclenumber);
+
 
             printBtn = (ImageView) itemView.findViewById(R.id.printBtn);
 

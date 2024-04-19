@@ -544,6 +544,8 @@
                     android:text="Grading Done By*" />
 
                 <EditText
+                    android:editable="false"
+                    android:focusable="false"
                     android:id="@+id/gradingdoneby"
                     style="@style/editTxt_normal"
                     android:layout_width="0dp"

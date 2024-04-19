@@ -22,6 +22,7 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.oilpalm3f.gradingapp.R;
 import com.oilpalm3f.gradingapp.cloudhelper.Log;
 import com.oilpalm3f.gradingapp.database.DataAccessHandler;
+import com.oilpalm3f.gradingapp.database.Queries;
 import com.oilpalm3f.gradingapp.dbmodels.GatepassTokenListModel;
 import com.oilpalm3f.gradingapp.dbmodels.GradingReportModel;
 
@@ -37,16 +38,16 @@ public class GatepasstokenlistAdapter extends RecyclerView.Adapter<Gatepasstoken
     private Context context;
     private GatepassTokenListModel item;
     private DataAccessHandler dataAccessHandler = null;
-    private ongatepasstokenprintselected onPrintSelected;
+    private ongatepasstokenprintselected ongatepasstokenPrintSelected;
 
     SimpleDateFormat input = new SimpleDateFormat("yyyy-MM-dd");
     SimpleDateFormat output = new SimpleDateFormat("dd-MM-yyyy");
     int row_index = -1;
     LayoutInflater mInflater;
 
-    public GatepasstokenlistAdapter(Context context) {
+    public GatepasstokenlistAdapter(Context context, List<GatepassTokenListModel> mList) {
         this.context = context;
-        mList = new ArrayList<>();
+        this.mList = mList;
         dataAccessHandler = new DataAccessHandler(context);
     }
 
@@ -67,11 +68,33 @@ public class GatepasstokenlistAdapter extends RecyclerView.Adapter<Gatepasstoken
 
         Log.d("getIsCollection", mList.get(position).getIsCollection() + "");
 
+       // String Milllocation = dataAccessHandler.getOnlyOneValueFromDb(Queries.getInstance().getmillLocationDesc(mList.get(position).getMillLocationTypeId()));
+
+       // Log.d("Milllocation", Milllocation);
+        Log.d("MilllocationId", mList.get(position).getMillLocation() + "");
+
+        int token = Integer.parseInt(mList.get(position).getGatePassSerialNumber());
+        android.util.Log.d("token", token + "");
+        String formattedToken = String.valueOf(token);
+        String tokenCount = "";
+        tokenCount = formattedToken;
+        android.util.Log.d("tokenCount", tokenCount + "");
+
         holder.tvgatepasstoken.setText(mList.get(position).getGatePassTokenCode() + "");
         holder.tvvehicleNumber.setText(mList.get(position).getVehicleNumber() + "");
-        holder.tvgatepassserialnumber.setText(mList.get(position).getGatePassSerialNumber() + "");
-        holder.tviscollection.setText(mList.get(position).getIsCollection() + "");
+        holder.tvgatepassserialnumber.setText(tokenCount + "");
+
+        String fruitType;
+
+        if ("0".contains(mList.get(position).getIsCollection())){
+            fruitType = "true";
+        }else{
+            fruitType = "false";
+        }
+
+        holder.tviscollection.setText(fruitType + "");
         holder.tvcreateddate.setText(mList.get(position).getCreatedDate() + "");
+        holder.tvmillLocation.setText(mList.get(position).getMillLocation()  + "");
 
         String datetime = mList.get(position).getGatePassTokenCode().substring(0, 14);
         String serialNumber = mList.get(position).getGatePassTokenCode().substring(14, 18);
@@ -80,7 +103,9 @@ public class GatepasstokenlistAdapter extends RecyclerView.Adapter<Gatepasstoken
         Log.d("serialNumber", serialNumber + "");
 
 
-        String qrCodeValue = datetime +"/" +serialNumber+"/" +mList.get(position).getIsCollection()+"/" + mList.get(position).getVehicleNumber();
+
+
+        String qrCodeValue =  mList.get(position).getGatePassTokenCode() +"/" +mList.get(position).getMillLocationTypeId()+"/" +mList.get(position).getGatePassSerialNumber()+"/" +mList.get(position).getIsCollection()+"/" + mList.get(position).getVehicleNumber();
 
         holder.tvgatepasstoken.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,12 +120,13 @@ public class GatepasstokenlistAdapter extends RecyclerView.Adapter<Gatepasstoken
             public void onClick(View v) {
 
                 Log.d("Method1", "into this");
+                Log.d("onPrintSelected",ongatepasstokenPrintSelected + "");
 
-                if (null != onPrintSelected) {
+                if (null != ongatepasstokenPrintSelected) {
 
                     Log.d("Method2", "into this");
 
-                    onPrintSelected.gatepasstokenprintOptionSelected(position);
+                    ongatepasstokenPrintSelected.gatepasstokenprintOptionSelected(position);
                 }
             }
         });
@@ -116,8 +142,8 @@ public class GatepasstokenlistAdapter extends RecyclerView.Adapter<Gatepasstoken
         notifyDataSetChanged();
     }
 
-    public void setonPrintSelected(final ongatepasstokenprintselected onPrintSelected) {
-        this.onPrintSelected = onPrintSelected;
+    public void setongatepassserialPrintSelected(final ongatepasstokenprintselected ongatepasstokenPrintSelected) {
+        this.ongatepasstokenPrintSelected = ongatepasstokenPrintSelected;
     }
 
     @Override
@@ -128,7 +154,7 @@ public class GatepasstokenlistAdapter extends RecyclerView.Adapter<Gatepasstoken
 
     public class GatepasstokenReportViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView tvgatepasstoken, tvvehicleNumber, tvgatepassserialnumber, tviscollection, tvcreateddate;
+        private TextView tvgatepasstoken, tvvehicleNumber, tvgatepassserialnumber, tviscollection, tvcreateddate, tvmillLocation;
         private ImageView printBtn;
 
         public GatepasstokenReportViewHolder(@NonNull View itemView) {
@@ -139,6 +165,7 @@ public class GatepasstokenlistAdapter extends RecyclerView.Adapter<Gatepasstoken
             tvgatepassserialnumber = (TextView) itemView.findViewById(R.id.tv_serialNumber);
             tviscollection = (TextView) itemView.findViewById(R.id.tv_collectiontype);
             tvcreateddate = (TextView) itemView.findViewById(R.id.tv_tokendate);
+            tvmillLocation = (TextView) itemView.findViewById(R.id.tv_millLocation);
             printBtn = (ImageView) itemView.findViewById(R.id.printBtn);
         }
     }

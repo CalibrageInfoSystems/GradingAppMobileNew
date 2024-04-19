@@ -19,6 +19,7 @@ import com.oilpalm3f.gradingapp.database.DataAccessHandler;
 import com.oilpalm3f.gradingapp.database.DatabaseKeys;
 import com.oilpalm3f.gradingapp.database.Queries;
 import com.oilpalm3f.gradingapp.dbmodels.GatePass;
+import com.oilpalm3f.gradingapp.dbmodels.GatePassOut;
 import com.oilpalm3f.gradingapp.dbmodels.GatePassToken;
 import com.oilpalm3f.gradingapp.dbmodels.GradingFileRepository;
 import com.oilpalm3f.gradingapp.ui.MainLoginScreen;
@@ -292,12 +293,14 @@ public class DataSyncHelper {
         List<GradingFileRepository> gradingrepoList = (List<GradingFileRepository>) dataAccessHandler.getGradingRepoDetails(Queries.getInstance().getGradingRepoRefresh(), 1);
         List<GatePassToken>gatepasstokenlist = (List<GatePassToken>) dataAccessHandler.getGatepasstokendetails(Queries.getInstance().getGatepasstokenRefresh(), 1);
         List<GatePass>gatepasslist = (List<GatePass>) dataAccessHandler.getGatepassdetails(Queries.getInstance().getGatepassRefresh(), 1);
+        List<GatePassOut>gatepassoutlist = (List<GatePassOut>) dataAccessHandler.getGatepassoutdetails(Queries.getInstance().getGatepassoutRefresh(), 1);
 
 
         LinkedHashMap<String, List> allRefreshDataMap = new LinkedHashMap<>();
         allRefreshDataMap.put(DatabaseKeys.TABLE_Grading_Repository, gradingrepoList);
         allRefreshDataMap.put(DatabaseKeys.TABLE_Gatepasstoken, gatepasstokenlist);
         allRefreshDataMap.put(DatabaseKeys.TABLE_GatepassIN, gatepasslist);
+        allRefreshDataMap.put(DatabaseKeys.TABLE_GatepassOut, gatepassoutlist);
 
         onComplete.execute(true, allRefreshDataMap, "here is collection of table transactions data");
 

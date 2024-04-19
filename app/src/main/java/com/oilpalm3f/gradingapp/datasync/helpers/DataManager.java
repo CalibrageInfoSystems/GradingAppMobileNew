@@ -12,6 +12,8 @@ public class DataManager<T> {
     public static final String USER_DETAILS = "user_details";
     public static final String USER_VILLAGES = "user_villages";
 
+    public static final String USER_ACTIVITY_RIGHTS = "user_activity_rights";
+
     private final Map<String, T> dataMap = new ConcurrentHashMap<>();
 
     public static DataManager getInstance() {

@@ -19,5 +19,6 @@
     <color name="white_new">#ffffff</color>
     <color name="light_gray">#BEBEBE</color>
     <color name="btnPressedColor">#F34130</color>
+    <color name="action_color">#263242</color>
 
 </resources>

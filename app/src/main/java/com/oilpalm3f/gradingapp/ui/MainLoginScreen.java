@@ -103,12 +103,22 @@ public class MainLoginScreen extends AppCompatActivity {
 //            }
             CommonConstants.USER_ID = userDetails.getId();
             CommonConstants.TAB_ID = dataAccessHandler.getOnlyOneValueFromDb(Queries.getInstance().getTabId(CommonUtils.getIMEInumber(MainLoginScreen.this)));
+            Log.d("CommonConstants.TAB_ID",CommonConstants.TAB_ID + "");
             CommonConstants.TAB_ID = CommonConstants.TAB_ID.replace("Tab", "T");
+            Log.d("CommonConstants.TAB_ID1",CommonConstants.TAB_ID + "");
             CommonConstants.USER_CODE = userDetails.getUserCode();
+            CommonConstants.USER_NAME = userDetails.getUserName();
+            CommonConstants.ROLEID = userDetails.getRoleId() + "";
+
+            Log.d("ROLEID",CommonConstants.ROLEID + "");
+            Log.d("getUserName",CommonConstants.USER_NAME + "");
+
             imeiNumberTxt.setText(CommonUtils.getIMEInumber(this)+" ("+CommonConstants.TAB_ID+")");
-//            List<String> userActivityRights = dataAccessHandler.getSingleListData(Queries.getInstance().activityRightQuery(userDetails.getRoleId()));
-////            List<String> userActivityRights = dataAccessHandler.getSingleListData(Queries.getInstance().activityRightQuery(1));
+//           List<String> userActivityRights = dataAccessHandler.getSingleListData(Queries.getInstance().activityRightQuery(userDetails.getRoleId()));
+//////            List<String> userActivityRights = dataAccessHandler.getSingleListData(Queries.getInstance().activityRightQuery(1));
 //            DataManager.getInstance().addData(DataManager.USER_ACTIVITY_RIGHTS, userActivityRights);
+
+
             Log.v(LOG_TAG, "@@@@ activity rights ");
         } else {
             UiUtils.showCustomToastMessage("User not existed", MainLoginScreen.this, 1);

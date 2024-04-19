@@ -68,6 +68,16 @@ public class GatePassToken {
     private String CreatedDate;
     private int ServerUpdatedStatus;
 
+    private int MillLocationTypeId;
+
+    public int getLocationId() {
+        return MillLocationTypeId ;
+    }
+
+    public void setLocationId(int locationId) {
+        MillLocationTypeId  = locationId;
+    }
+
     public int getId() {
         return Id;
     }
