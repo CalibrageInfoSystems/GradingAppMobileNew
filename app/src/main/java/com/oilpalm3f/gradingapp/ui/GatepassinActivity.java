@@ -305,7 +305,13 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
         }
 
 
-        map.put("GatePassCode",currentDateTime +CommonConstants.TAB_ID+ splitString[1] + splitString[2]);
+        String gptvalue = splitString[0];
+        Log.d("gpcvalue", gptvalue + "");
+        String lastFourChars = gptvalue.substring(gptvalue.length() - 4);
+        Log.d("lastFourChars", lastFourChars + "");
+
+
+        map.put("GatePassCode",currentDateTime +CommonConstants.TAB_ID+ splitString[1] + lastFourChars);
         map.put("GatePassTokenCode", splitString[0] );
         map.put("WeighbridgeId", WeighbridgeId);
         map.put("VehicleTypeId", vehicleTypeCode);
@@ -362,12 +368,7 @@ public class GatepassinActivity extends AppCompatActivity implements BluetoothDe
             }
         });
     }
-
-
-
-
     private boolean validation() {
-
 
         if (vehiclecategory_spinner.getSelectedItemPosition() == 0) {
             UiUtils.showCustomToastMessage("Please Select  Vehicle Category", GatepassinActivity.this, 0);

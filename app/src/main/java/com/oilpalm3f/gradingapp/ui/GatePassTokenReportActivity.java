@@ -529,9 +529,13 @@ public class GatePassTokenReportActivity extends AppCompatActivity implements on
 //
 //        Log.d("datetime", datetime + "");
 //        Log.d("serialNumber", serialNumber + "");
+        String gptvalue = selectedReport.getGatePassTokenCode();
+        Log.d("gptvalue", gptvalue + "");
+        String lastFourChars = gptvalue.substring(gptvalue.length() - 4);
+        Log.d("lastFourChars", lastFourChars + "");
 
 
-        String qrCodeValue = selectedReport.getGatePassTokenCode() +"/" +selectedReport.getMillLocationTypeId()+"/" +selectedReport.getGatePassSerialNumber()+"/" +printfruitType+"/" + selectedReport.getVehicleNumber();
+        String qrCodeValue = selectedReport.getGatePassTokenCode() +"/" +selectedReport.getMillLocationTypeId()+"/" +lastFourChars+"/" +printfruitType+"/" + selectedReport.getVehicleNumber();
 
        // String qrCodeValue =  currentDateTime +"/"+ GatePassSerialNumber +"/" +selectedfruittype+"/" + vehiclenumber.getText().toString();
         android.util.Log.d("qrCodeValueis", qrCodeValue  + "");

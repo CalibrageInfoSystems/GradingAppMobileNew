@@ -479,7 +479,12 @@ public class GatePassInReportActivity extends AppCompatActivity implements ongat
         Log.d("serialNumber", serialNumber + "");
 
 
-        String qrCodeValue = selectedReport.getGatePassCode() +"/" +selectedReport.getSerialNumber()+"/" +printfruitType+"/" + selectedReport.getVehicleNumber()
+        String gpcvalue = selectedReport.getGatePassTokenCode();
+        Log.d("gpcvalue", gpcvalue + "");
+        String lastFourChars = gpcvalue.substring(gpcvalue.length() - 4);
+        Log.d("lastFourChars", lastFourChars + "");
+
+        String qrCodeValue = selectedReport.getGatePassCode() +"/" +lastFourChars+"/" +printfruitType+"/" + selectedReport.getVehicleNumber()
                 + "/" + selectedReport.getVehicleCategoryId()+"/" +selectedReport.getVehicleTypeId()+"/" + selectedReport.getWBID();
 
         // String qrCodeValue =  currentDateTime +"/"+ GatePassSerialNumber +"/" +selectedfruittype+"/" + vehiclenumber.getText().toString();

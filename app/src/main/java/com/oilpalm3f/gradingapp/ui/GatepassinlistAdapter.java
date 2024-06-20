@@ -83,7 +83,24 @@ public class GatepassinlistAdapter extends RecyclerView.Adapter<GatepassinlistAd
 //        Log.d("serialNumber", serialNumber + "");
 
 
-        String qrCodeValue = mList.get(position).getGatePassCode() +"/" +mList.get(position).getSerialNumber() +"/" +mList.get(position).getFruitType()+"/" + mList.get(position).getVehicleNumber()
+        String printfruitType;
+
+        Log.d("Collection", mList.get(position).getFruitType() + "");
+
+        if ("0".equals(mList.get(position).getFruitType())) {
+            printfruitType = "true";
+        } else {
+            printfruitType = "false";
+        }
+
+
+        String gpcvalue = mList.get(position).getGatePassCode();
+        Log.d("gpcvalue", gpcvalue + "");
+        String lastFourChars = gpcvalue.substring(gpcvalue.length() - 4);
+        Log.d("lastFourChars", lastFourChars + "");
+
+
+        String qrCodeValue = mList.get(position).getGatePassCode() +"/" +lastFourChars +"/" +printfruitType+"/" + mList.get(position).getVehicleNumber()
         + "/" +mList.get(position).getVehicleCategoryId()+"/" +mList.get(position).getVehicleTypeId()+"/" + mList.get(position).getWBID();
 
         holder.tvgatepasstokencode.setOnClickListener(new View.OnClickListener() {

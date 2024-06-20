@@ -31,6 +31,15 @@ android {
 //        }
 //    }
 
+//    signingConfigs {
+//        release {
+//            storeFile file('../app/keys/3f_Gradingapp_release_keys.jks')
+//            storePassword '3F_Grading'
+//            keyAlias '3F_Grading_App'
+//            keyPassword '3F_Grading'
+//        }
+//    }
+
     buildTypes {
         release {
             minifyEnabled false

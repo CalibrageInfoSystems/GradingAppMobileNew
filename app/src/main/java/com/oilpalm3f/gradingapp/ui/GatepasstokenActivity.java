@@ -210,6 +210,7 @@ import java.util.List;
                      SimpleDateFormat sdf1 = new SimpleDateFormat(CommonConstants.DATE_FORMAT_5);
                      currentdateandtimeforprint = sdf1.format(new Date());
                      Log.d("dateandtimeforprint", currentdateandtimeforprint + "");
+
                     qrCodeValue =  currentDateTime+CommonConstants.TAB_ID+LocationId+GatePassSerialNumber +"/"+ LocationId +"/" + GatePassSerialNumber +"/"+selectedfruittype+"/" + vehiclenumber.getText().toString();
 //                     qrCodeValue =  currentDateTime+CommonConstants.TAB_ID+LocationId+GatePassSerialNumber +"/"+ LocationId +"/" + GatePassSerialNumber +"/"+selectedfruittype+"/" + vehiclenumber.getText().toString()
 //                             +"/" + vehiclenumber.getText().toString()
