@@ -345,6 +345,7 @@ public class DataAccessHandler <T> {
                     grading_details.setCreatedDatewithtime(cursor.getString(cursor.getColumnIndex("CreatedDate")));
                     grading_details.setCreatedDate(cursor.getString(cursor.getColumnIndex("date")));
                     grading_details.setVehicleNumber(cursor.getString(cursor.getColumnIndex("VehicleNumber")));
+                    grading_details.setLooseFruitorBunches(cursor.getString(cursor.getColumnIndex("LooseFruitORBunches")));
                     grading_details.setGatePassCode(cursor.getString(cursor.getColumnIndex("GatePassCode")));
 
                     gradingReportDetails.add(grading_details);
@@ -397,6 +398,7 @@ public class DataAccessHandler <T> {
                     grading_details.setCreatedDatewithtime(cursor.getString(cursor.getColumnIndex("CreatedDate")));
                     grading_details.setCreatedDate(cursor.getString(cursor.getColumnIndex("date")));
                     grading_details.setVehicleNumber(cursor.getString(cursor.getColumnIndex("VehicleNumber")));
+                    grading_details.setLooseFruitorBunches(cursor.getString(cursor.getColumnIndex("LooseFruitORBunches")));
 
                     gradingReportDetails.add(grading_details);
                 } while (cursor.moveToNext());

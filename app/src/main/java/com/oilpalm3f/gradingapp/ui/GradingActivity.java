@@ -81,18 +81,19 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
     private static final String LOG_TAG = GradingActivity.class.getName();
 
     String qrvalue;
-    public TextView tokenNumber, millcode, type, grossweight,tokendate, weighBridgetokenNumber, vehiclenumber;
+    public TextView tokenNumber, millcode, type, grossweight,tokendate, weighBridgetokenNumber, vehiclenumber, loosefruitorbunches;
     String[] splitString;
 
     EditText unripen, underripe, ripen, overripe, diseased,
             emptybunches, longstalk, mediumstalk, shortstalk, optimum,loosefruitweight, rejectedBunches,gradingdoneby;
     Button submit;
     Spinner isloosefruitavailable_spinner;
-    LinearLayout loosefruitweightLL;
+    LinearLayout loosefruitweightLL, stalkqualitylyt, isloosefruitavailableLL, rejectedbunchesLL, emptybunchesLL;
 
    // String[] splitString;
     String firsteight;
     String fruitType;
+    String loosefruitorbunchesvalue;
 
     String somestring = "202109021331";
     int tokenexists;
@@ -144,6 +145,7 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
         tokendate = findViewById(R.id.tokendate);
         vehiclenumber = findViewById(R.id.vehiclenumber);
         weighBridgetokenNumber = findViewById(R.id.weighBridgetokenNumber);
+        loosefruitorbunches = findViewById(R.id.fruitType);
 
         unripen = findViewById(R.id.unripen);
         underripe = findViewById(R.id.underripe);
@@ -162,6 +164,10 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
         slipIcon = (ImageView) findViewById(R.id.slip_icon);
         isloosefruitavailable_spinner = findViewById(R.id.isloosefruitavailable_spinner);
         loosefruitweightLL = findViewById(R.id.loosefruitweightLL);
+        isloosefruitavailableLL =  findViewById(R.id.isloosefruitavailableLL);
+        rejectedbunchesLL = findViewById(R.id.rejectedbunchesLL);
+        emptybunchesLL = findViewById(R.id.emptybunchesLL);
+        stalkqualitylyt = findViewById(R.id.stalkqualitylyt);
         submit = findViewById(R.id.gradingsubmit);
 
         unripen.setFilters(new InputFilter[]{new InputFilterMinMax("0", "100")});
@@ -204,13 +210,14 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
         Log.d("splashslength", splitString.length + "");
         Log.d("splashslength", splitString.length - 1+ "");
 
-        if (splitString.length == 5 && splitString[0].length() == 26) {
+        if (splitString.length == 6 && splitString[0].length() == 26) {
 
         Log.d("String1", splitString[0] + "");
         Log.d("String2", splitString[1] + "");
         Log.d("String3", splitString[2] + "");
         Log.d("String4", splitString[3] + "");
         Log.d("String5", splitString[4] + "");
+        Log.d("String6", splitString[5] + "");
 //        if (splitString.length > 4) {
 //            Log.d("String5", splitString[4] + "");
 //        }
@@ -252,6 +259,23 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
             Log.d("tokenCount", tokenCount + "");
 
             weighBridgetokenNumber.setText(tokenCount);
+
+            loosefruitorbunchesvalue =  dataAccessHandler.getOnlyOneValueFromDb(Queries.getInstance().getloosefruitorbunchesvalue(splitString[5]));
+
+            loosefruitorbunches.setText(loosefruitorbunchesvalue);
+
+            if(splitString[5].equalsIgnoreCase("695")){
+                stalkqualitylyt.setVisibility(View.GONE);
+                isloosefruitavailableLL.setVisibility(View.GONE);
+                rejectedbunchesLL.setVisibility(View.GONE);
+                emptybunchesLL.setVisibility(View.GONE);
+
+            }else{
+                stalkqualitylyt.setVisibility(View.VISIBLE);
+                isloosefruitavailableLL.setVisibility(View.VISIBLE);
+                rejectedbunchesLL.setVisibility(View.VISIBLE);
+                emptybunchesLL.setVisibility(View.VISIBLE);
+            }
 
 
             tokenNumber.setText(splitString[0] + "");
@@ -454,10 +478,14 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
             UiUtils.showCustomToastMessage("Please Enter Diseased", GradingActivity.this, 0);
             return false;
         }
-        if (TextUtils.isEmpty(emptybunches.getText().toString())) {
-            UiUtils.showCustomToastMessage("Please Enter Empty Bunches", GradingActivity.this, 0);
-            return false;
+        if(!splitString[5].equalsIgnoreCase("695")) {
+            if (TextUtils.isEmpty(emptybunches.getText().toString())) {
+                UiUtils.showCustomToastMessage("Please Enter Empty Bunches", GradingActivity.this, 0);
+                return false;
+            }
         }
+        if(!splitString[5].equalsIgnoreCase("695")){
+
         if (TextUtils.isEmpty(longstalk.getText().toString())) {
             UiUtils.showCustomToastMessage("Please Enter Long Stalk Quality", GradingActivity.this, 0);
             return false;
@@ -475,17 +503,21 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
             return false;
         }
 
-        if (isloosefruitavailable_spinner.getSelectedItemPosition() == 0) {
-            UiUtils.showCustomToastMessage("Please Select Is Loose Fruit Available", GradingActivity.this, 0);
-            return false;
-        }
 
-        if (isloosefruitavailable_spinner.getSelectedItemPosition() == 1){
-            if (TextUtils.isEmpty(loosefruitweight.getText().toString())) {
-                UiUtils.showCustomToastMessage("Please Enter Loose Fruit Weight", GradingActivity.this, 0);
+
+            if (isloosefruitavailable_spinner.getSelectedItemPosition() == 0) {
+                UiUtils.showCustomToastMessage("Please Select Is Loose Fruit Available", GradingActivity.this, 0);
                 return false;
             }
+
+            if (isloosefruitavailable_spinner.getSelectedItemPosition() == 1){
+                if (TextUtils.isEmpty(loosefruitweight.getText().toString())) {
+                    UiUtils.showCustomToastMessage("Please Enter Loose Fruit Weight", GradingActivity.this, 0);
+                    return false;
+                }
+            }
         }
+
 
         if (TextUtils.isEmpty(gradingdoneby.getText().toString())) {
             UiUtils.showCustomToastMessage("Please Enter Grading Done By", GradingActivity.this, 0);
@@ -502,14 +534,27 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
             return false;
         }
 
-        if ((Double.parseDouble(unripen.getText().toString()) + Double.parseDouble(underripe.getText().toString()) + Double.parseDouble(ripen.getText().toString()) + Double.parseDouble(overripe.getText().toString()) + Double.parseDouble(diseased.getText().toString()) + Double.parseDouble(emptybunches.getText().toString())) != 100) {
-            UiUtils.showCustomToastMessage("FFB Bunch Quality should be equal to 100%", GradingActivity.this, 0);
-            return false;
+        if(!splitString[5].equalsIgnoreCase("695")) {
+
+            if ((Double.parseDouble(unripen.getText().toString()) + Double.parseDouble(underripe.getText().toString()) + Double.parseDouble(ripen.getText().toString()) + Double.parseDouble(overripe.getText().toString()) + Double.parseDouble(diseased.getText().toString()) + Double.parseDouble(emptybunches.getText().toString())) != 100) {
+                UiUtils.showCustomToastMessage("FFB Bunch Quality should be equal to 100%", GradingActivity.this, 0);
+                return false;
+            }
+        }
+        else {
+
+            if ((Double.parseDouble(unripen.getText().toString()) + Double.parseDouble(underripe.getText().toString()) + Double.parseDouble(ripen.getText().toString()) + Double.parseDouble(overripe.getText().toString()) + Double.parseDouble(diseased.getText().toString())) != 100) {
+                UiUtils.showCustomToastMessage("FFB Bunch Quality should be equal to 100%", GradingActivity.this, 0);
+                return false;
+            }
         }
 
-        if ((Double.parseDouble(longstalk.getText().toString()) + Double.parseDouble(mediumstalk.getText().toString()) + Double.parseDouble(shortstalk.getText().toString()) + Double.parseDouble(optimum.getText().toString())) != 100) {
-            UiUtils.showCustomToastMessage("FFB Stalk Quality should be equal to 100%", GradingActivity.this, 0);
-            return false;
+        if(!splitString[5].equalsIgnoreCase("695")) {
+
+            if ((Double.parseDouble(longstalk.getText().toString()) + Double.parseDouble(mediumstalk.getText().toString()) + Double.parseDouble(shortstalk.getText().toString()) + Double.parseDouble(optimum.getText().toString())) != 100) {
+                UiUtils.showCustomToastMessage("FFB Stalk Quality should be equal to 100%", GradingActivity.this, 0);
+                return false;
+            }
         }
 
         return true;
@@ -704,11 +749,26 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
             rejectedbunches = rejectedBunches.getText().toString();
         }
 
-        String hashString = qrvalue+"/"+CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS)+"/"+unripen.getText().toString()+"/"+underripe.getText().toString()+"/"+ripen.getText().toString()
-                +"/"+overripe.getText().toString()+"/"+diseased.getText().toString()+"/"+emptybunches.getText().toString()+"/"
-                +longstalk.getText().toString()+"/"+mediumstalk.getText().toString()+"/"+shortstalk.getText().toString()+"/"+
-                optimum.getText().toString()+"/"+fruitavailable+"/"+fruightweight+"/"+rejectedbunches+
-                "/"+gradingdoneby.getText().toString();
+        String hashString;
+
+        if (splitString[5].equalsIgnoreCase("695")){
+
+            hashString = qrvalue+"/"+CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS)+"/"+unripen.getText().toString()+"/"+underripe.getText().toString()+"/"+ripen.getText().toString()
+                    +"/"+overripe.getText().toString()+"/"+diseased.getText().toString()+"/"+"0"+"/"
+                    +"0"+"/"+"0"+"/"+"0"+"/"+ "0"+"/"+"false"+"/"+"0"+"/"+"0"+
+                    "/"+gradingdoneby.getText().toString();
+        }else{
+
+            hashString = qrvalue+"/"+CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS)+"/"+unripen.getText().toString()+"/"+underripe.getText().toString()+"/"+ripen.getText().toString()
+                    +"/"+overripe.getText().toString()+"/"+diseased.getText().toString()+"/"+emptybunches.getText().toString()+"/"
+                    +longstalk.getText().toString()+"/"+mediumstalk.getText().toString()+"/"+shortstalk.getText().toString()+"/"+
+                    optimum.getText().toString()+"/"+fruitavailable+"/"+fruightweight+"/"+rejectedbunches+
+                    "/"+gradingdoneby.getText().toString();
+        }
+
+
+
+
         String qrCodeValue = hashString;
         Log.d("qrCodeValueis", qrCodeValue  + "");
         Barcode barcode = new Barcode(PrinterConstants.BarcodeType.QRCODE, 3, 95, 3, qrCodeValue);
@@ -1005,32 +1065,45 @@ public class GradingActivity extends AppCompatActivity implements BluetoothDevic
         map.put("OverRipe", overripe.getText().toString());
         map.put("Diseased", diseased.getText().toString());
         map.put("EmptyBunches", emptybunches.getText().toString());
-        map.put("FFBQualityLong", longstalk.getText().toString());
-        map.put("FFBQualityMedium", mediumstalk.getText().toString());
-        map.put("FFBQualityShort", shortstalk.getText().toString());
-        map.put("FFBQualityOptimum", optimum.getText().toString());
-        int isfruitavailable = 0;
 
-        if (isloosefruitavailable_spinner.getSelectedItemPosition() == 1){
-
-            isfruitavailable = 1;
-        }else if (isloosefruitavailable_spinner.getSelectedItemPosition() == 2){
-            isfruitavailable = 0;
+        if(!splitString[5].equalsIgnoreCase("695")){
+            map.put("FFBQualityLong", longstalk.getText().toString());
+            map.put("FFBQualityMedium", mediumstalk.getText().toString());
+            map.put("FFBQualityShort", shortstalk.getText().toString());
+            map.put("FFBQualityOptimum", optimum.getText().toString());
         }
 
-        map.put("LooseFruit", isfruitavailable);
+        if(!splitString[5].equalsIgnoreCase("695")) {
 
-        if (isloosefruitavailable_spinner.getSelectedItemPosition() == 1) {
+            int isfruitavailable = 0;
 
-            map.put("LooseFruitWeight", loosefruitweight.getText().toString());
+            if (isloosefruitavailable_spinner.getSelectedItemPosition() == 1) {
+
+                isfruitavailable = 1;
+            } else if (isloosefruitavailable_spinner.getSelectedItemPosition() == 2) {
+                isfruitavailable = 0;
+            }
+
+            map.put("LooseFruit", isfruitavailable);
+
+            if (isloosefruitavailable_spinner.getSelectedItemPosition() == 1) {
+
+                map.put("LooseFruitWeight", loosefruitweight.getText().toString());
+            }
+
+            map.put("RejectedBunches", rejectedBunches.getText().toString());
+        }else{
+            int isfruitavailable = 0;
+            map.put("LooseFruit", isfruitavailable);
+          //  map.put("LooseFruitWeight", 0);
+
         }
-
-        map.put("RejectedBunches",rejectedBunches.getText().toString());
         map.put("GraderName", gradingdoneby.getText().toString());
         map.put("CreatedByUserId", CommonConstants.USER_ID);
         map.put("CreatedDate", CommonUtils.getcurrentDateTime(CommonConstants.DATE_FORMAT_DDMMYYYY_HHMMSS));
 
             map.put("VehicleNumber", vehiclenumber.getText().toString());
+            map.put("LooseFruitORBunches", splitString[5]);
 
 //            Log.d("GatePassCode", splitString[5]+ "");
 //            map.put("GatePassCode",  splitString[5] + "");

@@ -38,6 +38,7 @@ import com.oilpalm3f.gradingapp.printer.onPrinterType;
 import com.oilpalm3f.gradingapp.uihelper.ProgressBar;
 import com.oilpalm3f.gradingapp.utils.UiUtils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -391,9 +392,34 @@ public class GatePassInReportActivity extends AppCompatActivity implements ongat
             printttGatepasstokenData(printerInstance, i);
         }
     }
+    public static String convertDateFormat(String inputDate) {
+        String outputDate = null;
+
+        try {
+            // Input format
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            Date date = inputFormat.parse(inputDate);
+
+            // Output format
+            //SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat outputFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+            outputDate = outputFormat.format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            // Handle parsing exception if needed
+        }
+
+        return outputDate;
+    }
+
+
+
 
     private void printttGatepasstokenData(PrinterInstance mPrinter, int i) {
-
+        String createddate = convertDateFormat(selectedReport.getCreatedDate());
+        Log.d("createddate", createddate + "");
         String fruitType;
 
         Log.d("Collection", selectedReport.getFruitType() + "");
@@ -457,7 +483,7 @@ public class GatePassInReportActivity extends AppCompatActivity implements ongat
 
         sb.append(" Vehicle Type Name : ").append(selectedReport.getVehicleType() + "").append("\n");
         sb.append(" ");
-        sb.append(" Date : ").append(selectedReport.getCreatedDate() + "").append("\n");
+        sb.append(" Date : ").append(createddate + "").append("\n");
 
         sb.append("  Created By : ").append(selectedReport.getCreatedBy() + "").append("\n");
 

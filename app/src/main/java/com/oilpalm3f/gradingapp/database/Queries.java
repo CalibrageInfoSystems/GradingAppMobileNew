@@ -1292,7 +1292,7 @@ public class Queries {
 
     public String getGradingReports(int limit, int offset,final String fromDate, final String toDate, String seachKey) {
         String  stquery="select TokenNumber, CCCode, FruitType, GrossWeight, TokenDate, UnRipen, UnderRipe, Ripen, OverRipe, Diseased, EmptyBunches, FFBQualityLong, FFBQualityMedium, FFBQualityShort, FFBQualityOptimum, LooseFruit, LooseFruitWeight, GraderName, RejectedBunches, CreatedByUserId,CreatedDate,DATE(substr(CreatedDate, 0, INSTR(CreatedDate, ' ') + 1)) " +
-                "date, VehicleNumber from FFBGrading where date between '"+fromDate+"' and '"+toDate+"' AND VehicleNumber like '%" + seachKey + "%'";
+                "date, VehicleNumber, LooseFruitORBunches from FFBGrading where date between '"+fromDate+"' and '"+toDate+"' AND VehicleNumber like '%" + seachKey + "%'";
 
         return stquery;
     }
@@ -1356,5 +1356,9 @@ public class Queries {
 
     public String getgateoutTokenExistQuery(String GatePassCode) {
         return "SELECT EXISTS ( SELECT 1 FROM GatePassOut WHERE GatePassCode ='" + GatePassCode + "')";
+    }
+
+    public String getloosefruitorbunchesvalue(String loosefruitorbunchesId) {
+        return "select DESC from TypeCdDmt where TypeCdId = '" + loosefruitorbunchesId + "'";
     }
 }

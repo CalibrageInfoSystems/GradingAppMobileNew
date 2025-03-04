@@ -547,30 +547,32 @@ public class GradingReportActivity extends AppCompatActivity implements onPrintO
         }
 
         String  requiredvalue = null;
-        String  requiredvaluee = null;
+//        String  requiredvaluee = null;
 
-        SimpleDateFormat input = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        SimpleDateFormat output = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-        SimpleDateFormat outputt = new SimpleDateFormat("dd-MM-yyyy");
-
-        try {
-            Date inputdate = input.parse(selectedReport.getCreatedDatewithtime());
-            requiredvalue = output.format(inputdate);
-            Log.d("inputdate", inputdate + "");
-            Log.d("requiredvalue", requiredvalue + "");
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            Date inputdatee = input.parse(selectedReport.getCreatedDatewithtime());
-            requiredvaluee = outputt.format(inputdatee);
-
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        requiredvalue = convertDateFormat(selectedReport.getCreatedDatewithtime());
+        Log.d("requiredvalue", requiredvalue + "");
+//        SimpleDateFormat input = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        SimpleDateFormat output = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+//        SimpleDateFormat outputt = new SimpleDateFormat("dd-MM-yyyy");
+//
+//        try {
+//            Date inputdate = input.parse(selectedReport.getCreatedDatewithtime());
+//            requiredvalue = output.format(inputdate);
+//            Log.d("inputdate", inputdate + "");
+//            Log.d("requiredvalue", requiredvalue + "");
+//
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+//
+//        try {
+//            Date inputdatee = input.parse(selectedReport.getCreatedDatewithtime());
+//            requiredvaluee = outputt.format(inputdatee);
+//
+//
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
 
         mPrinter.init();
         StringBuilder sb = new StringBuilder();
@@ -732,8 +734,8 @@ public class GradingReportActivity extends AppCompatActivity implements onPrintO
             rejectedbunches = selectedReport.getRejectedBunches();
         }
 
-        String hashString = selectedReport.getTokenNumber()+"/"+selectedReport.getCCCode()+"/"+fruitTypeNumber+"/"+selectedReport.getGrossWeight()+"/"+selectedReport.getVehicleNumber()+"/"+selectedReport.getCreatedDatewithtime()+"/"+
-                selectedReport.getUnRipen()+"/"+selectedReport.getUnderRipe()
+        String hashString = selectedReport.getTokenNumber()+"/"+selectedReport.getCCCode()+"/"+fruitTypeNumber+"/"+selectedReport.getGrossWeight()+"/"+selectedReport.getVehicleNumber()+"/"+selectedReport.getLooseFruitorBunches()+"/"+
+                selectedReport.getCreatedDatewithtime()+"/"+ selectedReport.getUnRipen()+"/"+selectedReport.getUnderRipe()
                 +"/"+selectedReport.getRipen()+"/"+selectedReport.getOverRipe()+"/"+selectedReport.getDiseased()+"/"+selectedReport.getEmptyBunches()+"/"
                 +selectedReport.getFFBQualityLong()+"/"+selectedReport.getFFBQualityMedium()+"/"+selectedReport.getFFBQualityShort()+"/"+
                 selectedReport.getFFBQualityOptimum()+"/"+fruitavailable+"/"+fruightweight+"/"+rejectedbunches+
@@ -800,6 +802,31 @@ public class GradingReportActivity extends AppCompatActivity implements onPrintO
         }
 
     }
+
+
+
+    public static String convertDateFormat(String inputDate) {
+        String outputDate = null;
+
+        try {
+            // Input format
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            Date date = inputFormat.parse(inputDate);
+
+            // Output format
+            //SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat outputFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
+            outputDate = outputFormat.format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            // Handle parsing exception if needed
+        }
+
+        return outputDate;
+    }
+
 
     //Generate QRCode
 

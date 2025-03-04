@@ -89,7 +89,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="FruitType" />
+                    android:text="Token Type" />
 
                 <TextView
                     android:id="@+id/type"
@@ -188,9 +188,33 @@
                     />
             </LinearLayout>
 
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_top_layout"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/header_h1_text_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Fruit Type" />
+
+                <TextView
+                    android:id="@+id/fruitType"
+                    style="@style/header_h1_text_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    />
+            </LinearLayout>
+
+
             <TextView
                 style="@style/header_h1_text_title_with_background"
-                android:text="FFB Bunch Quality Details" />
+                android:text="FFB Quality Details" />
 
             <View
                 android:layout_width="match_parent"
@@ -318,6 +342,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/emptybunchesLL"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_top_layout"
@@ -340,6 +365,13 @@
                     android:layout_weight="1"
                     android:maxLength="3" />
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:id="@+id/stalkqualitylyt">
+
             <TextView
                 style="@style/header_h1_text_title_with_background"
                 android:text="FFB Stalk Quality Details" />
@@ -443,6 +475,9 @@
                     android:layout_weight="1"
                     android:maxLength="3" />
             </LinearLayout>
+
+            </LinearLayout>
+
             <TextView
                 style="@style/header_h1_text_title_with_background"
                 android:text="Questions" />

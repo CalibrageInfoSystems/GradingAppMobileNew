@@ -33,6 +33,17 @@ public class GradingReportModel {
     private String VehicleNumber;
     private String GatePassCode;
 
+    private String looseFruitorBunches;
+
+
+    public String getLooseFruitorBunches() {
+        return looseFruitorBunches;
+    }
+
+    public void setLooseFruitorBunches(String looseFruitorBunches) {
+        this.looseFruitorBunches = looseFruitorBunches;
+    }
+
     public String getGatePassCode() {
         return GatePassCode;
     }

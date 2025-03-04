@@ -184,8 +184,9 @@ public class CommonUtils {
             deviceId = mTelephony.getDeviceId();
         }
 
-        return deviceId;
-       //return "351558072434071";  //myid
+        //return deviceId;
+       return "351558072434071";  //myid
+      // return "9fac7f5a32533583";  //UAT user
          //return "351558072968326";
     }
 

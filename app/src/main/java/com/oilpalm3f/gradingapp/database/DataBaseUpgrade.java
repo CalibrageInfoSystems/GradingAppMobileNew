@@ -23,6 +23,7 @@ public class DataBaseUpgrade {
             if (isFreshInstall) {
                 upgradeDb1(db);
                 upgradeDb2(db);
+                upgradeDb3(db);
 //
 
             } else {
@@ -35,6 +36,9 @@ public class DataBaseUpgrade {
                             break;
                         case 2:
                             upgradeDb2(db);
+                            break;
+                        case 3:
+                            upgradeDb3(db);
                             break;
 
                     }
@@ -70,11 +74,12 @@ public class DataBaseUpgrade {
     private static void upgradeDb2( final SQLiteDatabase db) {
         Log.d(LOG_TAG, "******* upgradeDataBase 2 ******" + Palm3FoilDatabase.DATA_VERSION);
 
+        String fingerprintcolumn = "ALTER TABLE CollectionCenter Add IsFingerPrintReq BIT";
         String column1 = "Alter Table FFBGrading Add VehicleNumber Varchar(50)";
 
 
         String locationidcc = "ALTER TABLE CollectionCenter Add MillLocationTypeId INT";
-        String fingerprintcolumn = "ALTER TABLE CollectionCenter Add IsFingerPrintReq BIT";
+
 
 
 
@@ -217,10 +222,9 @@ public class DataBaseUpgrade {
         String locationcc  = "Alter Table CollectionCenter Add LocationId  INT NOT NULL";
 
         try {
-
+            db.execSQL(fingerprintcolumn);
             db.execSQL(column1);
             db.execSQL(locationidcc);
-            db.execSQL(fingerprintcolumn);
             db.execSQL(GatePassToken);
             db.execSQL(GatePass);
             db.execSQL(ActivityRight);
@@ -234,6 +238,26 @@ public class DataBaseUpgrade {
             db.execSQL(Role);
             db.execSQL(RoleActivityRightXref);
             db.execSQL(GatePassOut);
+
+//            db.execSQL(LocationIdGP);
+//            db.execSQL(SerialNumber);
+//            db.execSQL(FruitType);
+//            db.execSQL(VehicleNumber);
+
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    private static void upgradeDb3( final SQLiteDatabase db) {
+        Log.d(LOG_TAG, "******* upgradeDataBase 3 ******" + Palm3FoilDatabase.DATA_VERSION);
+
+        String column1 = "Alter Table FFBGrading Add LooseFruitORBunches Varchar(50)";
+
+        try {
+
+            db.execSQL(column1);
 
 //            db.execSQL(LocationIdGP);
 //            db.execSQL(SerialNumber);

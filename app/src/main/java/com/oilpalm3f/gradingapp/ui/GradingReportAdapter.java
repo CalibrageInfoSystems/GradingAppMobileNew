@@ -73,7 +73,7 @@ public class GradingReportAdapter extends RecyclerView.Adapter<GradingReportAdap
     @Override
     public void onBindViewHolder(CollectionReportViewHolder holder, final int position) {
 
-       item = mList.get(position);
+        item = mList.get(position);
 
         if (item == null)
             return;
@@ -82,26 +82,27 @@ public class GradingReportAdapter extends RecyclerView.Adapter<GradingReportAdap
         String fruitTypeNumber;
         boolean fruitavailable;
 
-        if (item.getFruitType().equalsIgnoreCase("1")){
+        if (item.getFruitType().equalsIgnoreCase("1")) {
 
             fruitType = "Collection";
-        }else{
+        } else {
             fruitType = "Consignment";
         }
 
-        if (mList.get(position).getFruitType().equalsIgnoreCase("1")){
+        if (mList.get(position).getFruitType().equalsIgnoreCase("1")) {
 
             fruitTypeNumber = "01";
-        }else{
+        } else {
             fruitTypeNumber = "02";
         }
 
-        if( mList.get(position).getLooseFruit().equalsIgnoreCase("1")){
+        if (mList.get(position).getLooseFruit().equalsIgnoreCase("1")) {
 
             fruitavailable = true;
-        }else {
+        } else {
             fruitavailable = false;
         }
+
 
         String fruightweight;
         String rejectedbunches;
@@ -131,9 +132,17 @@ public class GradingReportAdapter extends RecyclerView.Adapter<GradingReportAdap
             e.printStackTrace();
         }
 
+        String loosefruitorbunches;
+
+        loosefruitorbunches = dataAccessHandler.getOnlyOneValueFromDb(Queries.getInstance().getloosefruitorbunchesvalue(mList.get(position).getLooseFruitorBunches()));
+
+        holder.tvFruitType.setText(loosefruitorbunches);
+
+
+
 //Created QrCode String
-        String hashString = mList.get(position).getTokenNumber()+"/"+mList.get(position).getCCCode()+"/"+fruitTypeNumber+"/"+mList.get(position).getGrossWeight()+"/"+ mList.get(position).getVehicleNumber()+"/"+mList.get(position).getCreatedDatewithtime()+"/"+
-                mList.get(position).getUnRipen()+"/"+mList.get(position).getUnderRipe()
+        String hashString = mList.get(position).getTokenNumber()+"/"+mList.get(position).getCCCode()+"/"+fruitTypeNumber+"/"+mList.get(position).getGrossWeight()+"/"+ mList.get(position).getVehicleNumber()+"/"+mList.get(position).getLooseFruitorBunches()
+                +"/"+mList.get(position).getCreatedDatewithtime()+"/"+ mList.get(position).getLooseFruitorBunches()+"/"+mList.get(position).getUnRipen()+"/"+mList.get(position).getUnderRipe()
                 +"/"+mList.get(position).getRipen()+"/"+mList.get(position).getOverRipe()+"/"+mList.get(position).getDiseased()+"/"+mList.get(position).getEmptyBunches()+"/"
                 +mList.get(position).getFFBQualityLong()+"/"+mList.get(position).getFFBQualityMedium()+"/"+mList.get(position).getFFBQualityShort()+"/"+
                 mList.get(position).getFFBQualityOptimum()+"/"+fruitavailable+"/"+fruightweight+"/"+rejectedbunches+
@@ -201,12 +210,15 @@ public class GradingReportAdapter extends RecyclerView.Adapter<GradingReportAdap
 
         holder.tvtokennumber.setText(item.getTokenNumber().trim());
         holder.tv_cccode.setText(item.getCCCode().trim());
-       holder.tvFruitType.setText(fruitType);
+       holder.tvTokenType.setText(fruitType);
         holder.tvgrossweight.setText(item.getGrossWeight().trim() + " (Kgs)" );
         holder.tvweighbridgetokennumber.setText(finaltoken);
 //        Log.d("VehicleNumber1", mList.get(position).getVehicleNumber() + "");
 //        Log.d("VehicleNumber2", item.getVehicleNumber() + "");
         holder.vehicleNumber.setText(mList.get(position).getVehicleNumber());
+
+
+
 //        String plotCodes = TextUtils.join(", ",dataAccessHandler.getListOfCodes(Queries.getInstance().getPlotCodes(item.getCode())).toArray());
 
         holder.tvtokendate.setText(mList.get(position).getCreatedDatewithtime() + "");
@@ -245,13 +257,17 @@ public class GradingReportAdapter extends RecyclerView.Adapter<GradingReportAdap
             //  holder.createdDateTextView.setVisibility(View.GONE);
         }
 
+        if (mList.get(position).getLooseFruitorBunches().equalsIgnoreCase("Bunches")){
 
-
-        if(!TextUtils.isEmpty(item.getRejectedBunches()))
-        holder.tvrejectedbunches.setText(item.getRejectedBunches()+"");
-        else{
-            holder.linearrejectedbunches.setVisibility(View.GONE);
+            if(!TextUtils.isEmpty(item.getRejectedBunches()))
+                holder.tvrejectedbunches.setText(item.getRejectedBunches()+"");
+            else{
+                holder.linearrejectedbunches.setVisibility(View.GONE);
+            }
         }
+
+
+
 
 
         holder.printBtn.setOnClickListener(new View.OnClickListener() {
@@ -339,7 +355,7 @@ public class GradingReportAdapter extends RecyclerView.Adapter<GradingReportAdap
     public class CollectionReportViewHolder extends RecyclerView.ViewHolder {
         private TextView tvtokennumber;
         private TextView tv_cccode;
-        private TextView tvFruitType;
+        private TextView tvTokenType, tvFruitType;
         private TextView tvgrossweight;
         private TextView tvtokendate;
 
@@ -364,7 +380,8 @@ public class GradingReportAdapter extends RecyclerView.Adapter<GradingReportAdap
             super(view);
             tvtokennumber = (TextView) view.findViewById(R.id.tvtokennumber);
             tv_cccode = (TextView) view.findViewById(R.id.tv_cccode);
-            tvFruitType = (TextView) view.findViewById(R.id.tvFruitType);
+            tvTokenType = (TextView) view.findViewById(R.id.tvTokenType);
+            tvFruitType = (TextView) view.findViewById(R.id.fruitType);
             tvgrossweight = (TextView) view.findViewById(R.id.tvgrossweight);
             tvtokendate = (TextView) view.findViewById(R.id.tvtokendate);
             vehicleNumber = (TextView) view.findViewById(R.id.vehicleNumber);
@@ -473,7 +490,7 @@ public class GradingReportAdapter extends RecyclerView.Adapter<GradingReportAdap
                 linearffbqualityoptimum.setVisibility(View.GONE);
             }
 
-            if(item.getLooseFruitWeight()!= null  ){
+            if(!TextUtils.isEmpty(item.getLooseFruitWeight())){
                 tvloosefruitweight.setText(item.getLooseFruitWeight()+" (Kgs)");}
             else{
                 linearloosefruitweight.setVisibility(View.GONE);
